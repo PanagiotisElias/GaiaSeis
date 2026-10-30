@@ -1,5 +1,7 @@
 # GaiaSeis
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23810257.svg)](https://doi.org/10.5281/zenodo.23810257)
+
 **GNSS-based real-time seismogeodesy platform.** GaiaSeis connects to NTRIP
 casters, decodes the RTCM 3 streams of a GNSS receiver (MSM4–7 observations,
 broadcast ephemerides, optional SSR), groups each receiver epoch and hands it
@@ -13,7 +15,7 @@ Elias (<pelias@upatras.gr>). Version 0.5.0 (2026-10-30), licence
 
 - Platform (this repository): <https://github.com/PanagiotisElias/GaiaSeis>
 - Default engine, **GaiaVario**: <https://github.com/PanagiotisElias/GaiaVario.jl>
-- Archive and DOI: Zenodo (TRANSFORM² community); the DOI is added after the first release.
+- Archive: Zenodo, DOI [10.5281/zenodo.23810257](https://doi.org/10.5281/zenodo.23810257) (all versions; this release: [10.5281/zenodo.23810258](https://doi.org/10.5281/zenodo.23810258))
 
 ## How it is organised
 

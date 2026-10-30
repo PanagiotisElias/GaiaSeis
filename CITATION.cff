@@ -7,7 +7,7 @@ date-released: 2026-10-30
 license: AGPL-3.0-only
 repository-code: "https://github.com/PanagiotisElias/GaiaSeis"
 url: "https://github.com/PanagiotisElias/GaiaSeis"
-# doi: 10.5281/zenodo.XXXXXXX   (filled in after the first Zenodo archive)
+doi: 10.5281/zenodo.23810257
 authors:
   - family-names: Elias
     given-names: Panagiotis

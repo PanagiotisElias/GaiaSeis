@@ -42,7 +42,7 @@ The user manual (`docs/MANUAL.md`, also as .docx) covers the theory, the engines
 - **Documents** (manual, reports, leaflet, guides, figures): Creative Commons Attribution-NonCommercial 4.0 International.
 - **PPPH-VA.** The code keeps an in-bridge path for the author's Julia translation of PPPH-VA (Bahadur, Bezcioglu & Yigit, *GPS Solutions* 28:31, 2024). It is not distributed and the public platform does not depend on it; it runs only where that package is installed, pending its authors' agreement on a licence.
 - **Third-party data** (ANTEX antenna calibrations, the GPT3 grid) are not redistributed; the manual says where to obtain them.
-- **Citing.** Each repository carries a `CITATION.cff`; the Zenodo DOIs are added to the files and to the READMEs with the first archived release.
+- **Citing.** Each repository carries a `CITATION.cff`. Zenodo DOIs: GaiaSeis 10.5281/zenodo.23810257 (all versions; 0.5.0: 10.5281/zenodo.23810258), GaiaVario 10.5281/zenodo.23810265 (all versions; 0.1.0: 10.5281/zenodo.23810266).
 
 ## 5. Status and plans
 
