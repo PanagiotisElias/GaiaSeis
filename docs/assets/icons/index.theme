@@ -1,0 +1,22 @@
+[Icon Theme]
+Name=GaiaSeis
+Comment=Bundled application icons for GaiaSeis
+Inherits=hicolor
+Directories=scalable/apps,128x128/apps,64x64/apps
+
+[scalable/apps]
+Size=128
+MinSize=16
+MaxSize=512
+Type=Scalable
+Context=Applications
+
+[128x128/apps]
+Size=128
+Type=Fixed
+Context=Applications
+
+[64x64/apps]
+Size=64
+Type=Fixed
+Context=Applications

@@ -1,0 +1,7 @@
+name = "GaiaSeisEngineAPI"
+uuid = "5d3c7e2a-9b41-4f6e-8c1d-2a7e4b9f0c13"
+authors = ["Panagiotis Elias"]
+version = "0.1.0"
+
+[compat]
+julia = "1.9"

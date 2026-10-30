@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=GaiaSeis
+GenericName=GNSS Seismogeodesy
+Comment=GNSS-based real-time seismogeodesy via PPP-VA
+Exec=@EXEC@
+Path=@PATH@
+Icon=@ICON@
+Terminal=false
+Categories=Science;Geoscience;Education;
+Keywords=GNSS;GPS;NTRIP;RTCM;PPP;seismology;geodesy;miniSEED;
+StartupNotify=true
+StartupWMClass=GaiaSeis

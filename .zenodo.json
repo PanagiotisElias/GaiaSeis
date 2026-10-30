@@ -1,0 +1,30 @@
+{
+  "title": "GaiaSeis: GNSS-based real-time seismogeodesy platform",
+  "upload_type": "software",
+  "description": "<p>GaiaSeis connects to NTRIP casters, decodes RTCM 3 observation and ephemeris streams, groups each receiver epoch and hands it to a displacement engine plug-in (default: GaiaVario, a variometric engine in its own repository), and publishes the displacement time series as miniSEED files, a SeedLink feed (through ringserver), a web page and a GTK GUI. Written in Julia.</p><p>This work is part of the <a href=\"https://www.transform2-project.eu/\">TRANSFORM²</a> project which aims to improve physical and digital infrastructure across Near-Fault Observatories (NFOs) in Europe. TRANSFORM² is funded by the European Union under project number 101188365 within the HORIZON-INFRA-2024-DEV-01-01 call.</p>",
+  "creators": [
+    {
+      "name": "Elias, Panagiotis",
+      "affiliation": "Deforming Gaia Lab, Department of Geology, University of Patras, Greece",
+      "orcid": "0000-0002-8650-0895"
+    }
+  ],
+  "license": "AGPL-3.0-only",
+  "access_right": "open",
+  "keywords": ["GNSS", "seismogeodesy", "real-time", "NTRIP", "RTCM", "variometric approach", "miniSEED", "SeedLink", "Julia", "near-fault observatory"],
+  "communities": [
+    {"identifier": "transform2-project"}
+  ],
+  "grants": [
+    {"id": "10.13039/501100000780::101188365"}
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/PanagiotisElias/GaiaVario.jl",
+      "relation": "requires",
+      "resource_type": "software",
+      "scheme": "url"
+    }
+  ],
+  "language": "eng"
+}

@@ -1,0 +1,105 @@
+<html><head><meta charset="utf-8"><title>GaiaSeis: Τροφοδοσία της λύσης μετατόπισης πραγματικού χρόνου στο SeisComP</title><style>body{font-family:Cambria,Georgia,serif;font-size:11pt;line-height:1.35;max-width:17cm}
+h1{font-size:18pt;color:#1a3b6e;border-bottom:2px solid #1a3b6e;padding-bottom:4px}
+h2{font-size:14pt;color:#1a3b6e;margin-top:18pt} h3{font-size:12pt;color:#333}
+table{border-collapse:collapse;margin:8pt 0;font-size:10pt} th,td{border:1px solid #999;padding:3pt 6pt;text-align:left} th{background:#e8eef7}
+code,pre{font-family:Consolas,"DejaVu Sans Mono",monospace;font-size:9.5pt} pre{background:#f4f4f4;border:1px solid #ccc;padding:6pt}
+.note{background:#fff8e1;border-left:4px solid #e0a800;padding:6pt 8pt;margin:8pt 0}
+.small{font-size:9pt;color:#555}
+</style></head><body>
+<h1>GaiaSeis: Τροφοδοσία της λύσης μετατόπισης πραγματικού χρόνου στο SeisComP</h1>
+<p>Πώς περνά η ροή μετατόπισης 10 Hz ενός σταθμού GaiaSeis σε ένα σύστημα SeisComP μέσω SeedLink. Στην ίδια κεραία του Πανεπιστημίου Πατρών υπάρχουν δύο σταθμοί: <b>UPC10Z</b> (σε παραγωγή από 22/10/2026, κωδικός σταθμού <code>UPC10</code>) και <b>UPA10Z</b> (κωδικός <code>UPA10</code>, ο σταθμός παραγωγής έως τις 22/10/2026). Χρησιμοποιήστε αυτόν που εκπέμπει· οι εντολές δίνονται για τον UPC10 με τον UPA10 σε παρένθεση. GaiaSeis 0.4.2, SeisComP 5 ή 6. Γράφτηκε 06/10/2026, ενημερώθηκε 22/10/2026.</p>
+<div class="note"><b>Η διεύθυνση SeedLink (<code>&lt;seedlink-host&gt;:18000</code>) δίνεται στους καταναλωτές ξεχωριστά· είναι προσωρινή μέχρι την εγκατάσταση αποκλειστικού διακομιστή ringserver, και τότε αλλάζει μόνο το όνομα του διακομιστή.</b></div>
+<h2>1. Τι παρέχει το GaiaSeis</h2>
+<p>Το GaiaSeis γράφει τη λύση του ως miniSEED και προωθεί κάθε εγγραφή σε έναν <code>ringserver</code> που τρέχει δίπλα του. Ο ringserver είναι ο διακομιστής SeedLink· το SeisComP συνδέεται σε αυτόν όπως σε οποιαδήποτε άλλη πηγή SeedLink.</p>
+<table width="100%"><tr><th>στοιχείο</th><th>UPC10Z (παραγωγή από 22/10/2026)</th><th>UPA10Z</th></tr><tr><td>Διακομιστής SeedLink</td><td>ο υπολογιστής του GaiaSeis, θύρα 18000 (<code>&lt;seedlink-host&gt;:18000</code>)· δέχεται μόνο τα δίκτυα του τμήματος και localhost</td><td>ίδιος</td></tr><tr><td>Δίκτυο, σταθμός, location</td><td><code>CL</code>, <code>UPC10</code>, κενό</td><td><code>CL</code>, <code>UPA10</code>, κενό</td></tr><tr><td>Δέκτης</td><td>Topcon NET-G5, ενσωματωμένος caster NTRIP, mount <code>B</code></td><td>Topcon NET-G5, ενσωματωμένος caster NTRIP, mount <code>B</code></td></tr><tr><td>Κατάσταση</td><td>εκπέμπει, SSR απενεργοποιημένο, <code>CL.UPC10</code> στο SeedLink και στο <code>mseed2/</code></td><td>δεν εκπέμπει από 22/10/2026 13:21 UTC· ο <code>CL.UPA10</code> σταμάτησε τότε</td></tr><tr><td>Κανάλια</td><td><code>LNN</code> βορράς, <code>LNE</code> ανατολή, <code>LNZ</code> κατακόρυφο</td><td>ίδια</td></tr><tr><td>Ρυθμός δειγματοληψίας</td><td>10 Hz (ένα δείγμα ανά επιλυμένη εποχή)</td><td>ίδιος</td></tr><tr><td>Κωδικοποίηση</td><td>miniSEED 2.4, εγγραφές 512 byte, δείγματα INT32, big-endian</td><td>ίδια</td></tr><tr><td>Μονάδες</td><td>counts· 1 count = 0,1 µm. Counts × 10⁻⁷ = μέτρα μετατόπισης ανά εποχή</td><td>ίδιες</td></tr><tr><td>Χρονοσήμανση</td><td>UTC (τα δευτερόλεπτα διαφοράς GPS–UTC αφαιρούνται πριν τη σήμανση)</td><td>ίδια</td></tr><tr><td>Μέγεθος</td><td>μετατόπιση από εποχή σε εποχή της βαριομετρικής λύσης, δηλαδή ταχύτητα × 0,1 s· ολοκληρώστε για αλλαγή θέσης</td><td>ίδιο</td></tr><tr><td>Κενά</td><td>μια εποχή που λείπει ή έχει ακυρωθεί κλείνει την εγγραφή· το SeisComP βλέπει πραγματικό κενό, όχι χρονικά μετατοπισμένο ίχνος</td><td>ίδια</td></tr><tr><td>Επανάληψη</td><td>ο ringserver κρατά δακτύλιο δίσκου 1 GiB (περίπου μία ημέρα με το τρέχον ένα-δείγμα-ανά-εγγραφή, 2,5 ημέρες με flush 1 s)· πελάτης που επανασυνδέεται συνεχίζει από τον αριθμό ακολουθίας</td><td>ίδια</td></tr></table>
+<p>Κάθε στιγμή υπάρχει μόνο μία από τις δύο ροές (μία συνεδρία GaiaSeis σε παραγωγή). Καταναλωτής που θέλει και τις δύο εγγράφεται και στους δύο σταθμούς· όποιος δεν εκπέμπει απλώς δεν παραδίδει τίποτα. Οι ενσωματωμένοι casters των δεκτών υποβαθμίζονται με κάθε επιπλέον πελάτη, γι' αυτό μη συνδέετε ποτέ δεύτερο πελάτη NTRIP στον δέκτη που χρησιμοποιεί η παραγωγή· η πλευρά SeedLink δεν έχει τέτοιο όριο.</p>
+<p><b>Προσωρινή διάταξη.</b> Ο ringserver τρέχει προς το παρόν στο ίδιο μηχάνημα με το GaiaSeis (<code>&lt;seedlink-host&gt;:18000</code>). Αυτό είναι προσωρινό, έως ότου εγκατασταθεί αποκλειστικός διακομιστής ringserver. Τότε το GaiaSeis θα προωθεί τις εγγραφές του στον νέο διακομιστή μέσω DataLink (πεδία προφίλ <code>datalink_host</code> / <code>datalink_port</code>), η διεύθυνση SeedLink των ενοτήτων 2 και 4 αλλάζει στον νέο διακομιστή και κάθε πελάτης πρέπει να επανακατευθυνθεί· οι κωδικοί σταθμών, τα κανάλια, οι μονάδες και το inventory μένουν ίδια. Κρατήστε τη διεύθυνση SeedLink σε ένα ρυθμιζόμενο σημείο στην πλευρά του καταναλωτή, ώστε η μετάβαση να είναι αλλαγή μίας γραμμής.</p>
+<p>Η ροή δεδομένων υπάρχει μόνο όσο το GaiaSeis εκπέμπει. Ο ringserver παραμένει ενεργός ανεξάρτητα, ως υπηρεσία χρήστη systemd (<code>gaiaseis-ringserver</code>).</p>
+<h2>2. Γρήγορος έλεγχος πριν αγγίξετε το SeisComP</h2>
+<p>Από μηχάνημα των δικτύων του τμήματος (από 23/10/2026 ο ringserver δέχεται συνδέσεις μόνο από τα δίκτυα του τμήματος και localhost, <code>AcceptIP</code> στη ρύθμισή του· κάθε άλλη διεύθυνση απορρίπτεται κατά τη σύνδεση):</p>
+<pre>python3 tools/seedlink_check.py &lt;seedlink-host&gt; 18000 30 CL UPC10     # ή CL UPA10</pre>
+<p>Τυπώνει τις εγγραφές καθώς φτάνουν και τελειώνει με <code>OK: all three channels streaming</code>. Με εγκατεστημένο SeisComP ο ίδιος έλεγχος είναι:</p>
+<pre>slinktool -Q -S CL_UPC10 &lt;seedlink-host&gt;:18000      # ή CL_UPA10</pre>
+<p>Με ObsPy:</p>
+<pre>from obspy.clients.seedlink.basic_client import Client
+c = Client(&quot;&lt;seedlink-host&gt;&quot;, 18000)
+print(c.get_info(level=&quot;station&quot;))</pre>
+<h2>3. Inventory</h2>
+<p>Το SeisComP δεν δρομολογεί, δεν εμφανίζει και δεν αρχειοθετεί ροή για την οποία δεν έχει inventory. Δημιουργήστε τον σταθμό μία φορά με ένα μικρό αρχείο StationXML ή SC3ML και εισαγάγετέ το. Η απόκριση είναι καθαρό κέρδος: είσοδος μετατόπιση σε μέτρα, έξοδος counts, κέρδος 10⁷ counts ανά μέτρο, χωρίς πόλους ή μηδενικά.</p>
+<p>Πλήρες αρχείο για τον σταθμό παραγωγής είναι το <code>docs/UPC10.xml</code> (τρία κανάλια, συντεταγμένες της κεραίας, έναρξη 2026-10-22T13:21:00). Για τον UPA10Z αλλάξτε τον κωδικό σταθμού και την ημερομηνία έναρξης. Το πρότυπο δείχνει ένα κανάλι:</p>
+<pre>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;FDSNStationXML xmlns=&quot;http://www.fdsn.org/xml/station/1&quot; schemaVersion=&quot;1.1&quot;&gt;
+  &lt;Source&gt;GaiaSeis&lt;/Source&gt;
+  &lt;Created&gt;2026-10-22T13:30:00&lt;/Created&gt;
+  &lt;Network code=&quot;CL&quot; startDate=&quot;2026-01-01T00:00:00&quot;&gt;
+    &lt;Description&gt;Corinth Rift Laboratory GNSS seismogeodesy (GaiaSeis)&lt;/Description&gt;
+    &lt;Station code=&quot;UPC10&quot; startDate=&quot;2026-10-22T13:21:00&quot;&gt;
+      &lt;Latitude&gt;38.283226&lt;/Latitude&gt;&lt;Longitude&gt;21.786237&lt;/Longitude&gt;&lt;Elevation&gt;120&lt;/Elevation&gt;
+      &lt;Site&gt;&lt;Name&gt;University of Patras, GaiaSeis 10 Hz&lt;/Name&gt;&lt;/Site&gt;
+      &lt;Channel code=&quot;LNN&quot; locationCode=&quot;&quot; startDate=&quot;2026-10-22T13:21:00&quot;&gt;
+        &lt;Latitude&gt;38.283226&lt;/Latitude&gt;&lt;Longitude&gt;21.786237&lt;/Longitude&gt;&lt;Elevation&gt;120&lt;/Elevation&gt;&lt;Depth&gt;0&lt;/Depth&gt;
+        &lt;Azimuth&gt;0&lt;/Azimuth&gt;&lt;Dip&gt;0&lt;/Dip&gt;
+        &lt;SampleRate&gt;10&lt;/SampleRate&gt;
+        &lt;Sensor&gt;&lt;Description&gt;GNSS variometric displacement (GaiaSeis/PPPHVA)&lt;/Description&gt;&lt;/Sensor&gt;
+        &lt;Response&gt;
+          &lt;InstrumentSensitivity&gt;&lt;Value&gt;1e7&lt;/Value&gt;&lt;Frequency&gt;0.1&lt;/Frequency&gt;
+            &lt;InputUnits&gt;&lt;Name&gt;M&lt;/Name&gt;&lt;Description&gt;Displacement in meters&lt;/Description&gt;&lt;/InputUnits&gt;
+            &lt;OutputUnits&gt;&lt;Name&gt;COUNTS&lt;/Name&gt;&lt;/OutputUnits&gt;&lt;/InstrumentSensitivity&gt;
+          &lt;Stage number=&quot;1&quot;&gt;
+            &lt;PolesZeros&gt;&lt;InputUnits&gt;&lt;Name&gt;M&lt;/Name&gt;&lt;/InputUnits&gt;&lt;OutputUnits&gt;&lt;Name&gt;V&lt;/Name&gt;&lt;/OutputUnits&gt;
+              &lt;PzTransferFunctionType&gt;LAPLACE (RADIANS/SECOND)&lt;/PzTransferFunctionType&gt;
+              &lt;NormalizationFactor&gt;1&lt;/NormalizationFactor&gt;&lt;NormalizationFrequency&gt;0.1&lt;/NormalizationFrequency&gt;&lt;/PolesZeros&gt;
+            &lt;StageGain&gt;&lt;Value&gt;1&lt;/Value&gt;&lt;Frequency&gt;0.1&lt;/Frequency&gt;&lt;/StageGain&gt;
+          &lt;/Stage&gt;
+          &lt;Stage number=&quot;2&quot;&gt;
+            &lt;Coefficients&gt;&lt;InputUnits&gt;&lt;Name&gt;V&lt;/Name&gt;&lt;/InputUnits&gt;&lt;OutputUnits&gt;&lt;Name&gt;COUNTS&lt;/Name&gt;&lt;/OutputUnits&gt;
+              &lt;CfTransferFunctionType&gt;DIGITAL&lt;/CfTransferFunctionType&gt;&lt;/Coefficients&gt;
+            &lt;Decimation&gt;&lt;InputSampleRate&gt;10&lt;/InputSampleRate&gt;&lt;Factor&gt;1&lt;/Factor&gt;&lt;Offset&gt;0&lt;/Offset&gt;
+              &lt;Delay&gt;0&lt;/Delay&gt;&lt;Correction&gt;0&lt;/Correction&gt;&lt;/Decimation&gt;
+            &lt;StageGain&gt;&lt;Value&gt;1e7&lt;/Value&gt;&lt;Frequency&gt;0.1&lt;/Frequency&gt;&lt;/StageGain&gt;
+          &lt;/Stage&gt;
+        &lt;/Response&gt;
+      &lt;/Channel&gt;
+      &lt;!-- LNE: ίδιο μπλοκ με code=&quot;LNE&quot; και &lt;Azimuth&gt;90&lt;/Azimuth&gt;&lt;Dip&gt;0&lt;/Dip&gt; --&gt;
+      &lt;!-- LNZ: ίδιο μπλοκ με code=&quot;LNZ&quot; και &lt;Azimuth&gt;0&lt;/Azimuth&gt;&lt;Dip&gt;-90&lt;/Dip&gt; --&gt;
+    &lt;/Station&gt;
+  &lt;/Network&gt;
+&lt;/FDSNStationXML&gt;</pre>
+<p>Αντιγράψτε το μπλοκ καναλιού για <code>LNE</code> (αζιμούθιο 90, dip 0) και <code>LNZ</code> (αζιμούθιο 0, dip −90). Έπειτα, στον υπολογιστή του SeisComP:</p>
+<pre>fdsnxml2inv UPC10.xml &gt; UPC10.sc.xml        # ή UPA10.xml
+cp UPC10.sc.xml ~/seiscomp/etc/inventory/
+seiscomp update-config inventory</pre>
+<p>Το <code>scinv check</code> αναφέρει ό,τι δεν δέχθηκε. Οι κωδικοί καναλιών ακολουθούν τη σύμβαση SEED: <code>L</code> για ζώνη μακράς περιόδου 1 έως 10 Hz, <code>N</code> για αισθητήρα που μετρά απευθείας μετατόπιση, <code>N/E/Z</code> προσανατολισμός.</p>
+<h2>4. Σύνδεση του SeisComP με τη ροή</h2>
+<p>Υπάρχουν δύο τρόποι. Ο πρώτος αρκεί για προβολή και picking· ο δεύτερος είναι ο τυπικός όταν τα δεδομένα πρέπει να αρχειοθετηθούν και να αναμεταδοθούν.</p>
+<h3>4α. Απευθείας: RecordStream προς τον ringserver</h3>
+<p>Κάθε άρθρωμα SeisComP διαβάζει κυματομορφές μέσω <code>recordstream</code>. Ορίστε το καθολικά στο <code>~/seiscomp/etc/global.cfg</code>:</p>
+<pre>recordstream = slink://&lt;seedlink-host&gt;:18000</pre>
+<p>Τα <code>scrttv</code>, <code>scautopick</code>, <code>scamp</code> κ.λπ. διαβάζουν τότε τα κανάλια GaiaSeis απευθείας από τον ringserver. Τίποτα δεν αρχειοθετείται στην πλευρά SeisComP.</p>
+<h3>4β. Τυπικό: το seedlink του SeisComP με πηγή chain</h3>
+<p>Το άρθρωμα <code>seedlink</code> του SeisComP δέχεται την απομακρυσμένη ροή SeedLink, την αναμεταδίδει στον υπολογιστή SeisComP (θύρα 18000 εκεί) και αφήνει το <code>slarchive</code> να γράφει το αρχείο SDS. Προσθέστε προφίλ binding για το πρόσθετο chain:</p>
+<pre>seiscomp exec scconfig            # ή επεξεργαστείτε τα παρακάτω αρχεία με το χέρι</pre>
+<p>Δημιουργήστε το <code>~/seiscomp/etc/key/seedlink/profile_gaiaseis</code>:</p>
+<pre>sources = chain
+sources.chain.address = &lt;seedlink-host&gt;
+sources.chain.port = 18000
+sources.chain.selectors = LN?.D
+# κρατήστε τον αρχικό κωδικό σταθμού· χωρίς μετονομασία</pre>
+<p>Δέστε το στον σταθμό στο <code>~/seiscomp/etc/key/station_CL_UPC10</code> (ή/και <code>station_CL_UPA10</code>):</p>
+<pre>seedlink:gaiaseis
+slarchive:local</pre>
+<p>Έπειτα:</p>
+<pre>seiscomp update-config
+seiscomp restart seedlink slarchive
+slinktool -Q -S CL_UPC10 localhost:18000      # πρέπει τώρα να δείχνει τη ροή τοπικά</pre>
+<p>Με δεμένο το <code>slarchive</code>, οι εγγραφές πηγαίνουν στο <code>~/seiscomp/var/lib/archive/2026/CL/UPC10/LNZ.D/CL.UPC10..LNZ.D.2026.295</code>, την ίδια διάταξη SDS που χρησιμοποιεί το GaiaSeis για τα δικά του ημερήσια αρχεία. Ορίστε <code>recordstream</code> σε <code>slink://localhost:18000</code> για τα αρθρώματα πραγματικού χρόνου και σε <code>combined://slink/localhost:18000;sdsarchive//home/sysop/seiscomp/var/lib/archive</code> για όσα κοιτούν και πίσω στον χρόνο.</p>
+<h2>5. Προβολή</h2>
+<p>Το <code>scrttv</code> με επιλεγμένο τον σταθμό δείχνει τα τρία ίχνη. Χρήσιμα φίλτρα για ροή μετατόπισης ανά εποχή: κανένα για να φαίνονται τα βήματα, <code>BW_HP(2,0.02)</code> για καταστολή αργών ολισθήσεων. Η κλίμακα πλάτους είναι σε counts· διαιρέστε με 10⁷ για μέτρα. Στο <code>scrttv</code> η μονάδα του άξονα y προέρχεται από το inventory (<code>InputUnits = M</code>), οπότε με φορτωμένη την απόκριση το ίχνος επισημαίνεται σε μέτρα όταν είναι ενεργή η εμφάνιση μονάδων.</p>
+<p>Σημειώστε ότι η ροή είναι μετατόπιση ανά εποχή, όχι θέση. Μια στατική μετατόπιση του σταθμού μετά από σεισμό εμφανίζεται ως παλμός κατά την κίνηση και επιστρέφει στο μηδέν μετά· ολοκληρώστε (το <code>scrttv</code> δεν μπορεί· το ObsPy <code>trace.integrate()</code> μπορεί) για να δείτε το βήμα.</p>
+<h2>6. Picking και πλάτη</h2>
+<p>Μην αφήσετε το προεπιλεγμένο <code>scautopick</code> να τρέξει σε αυτά τα κανάλια με τις ρυθμίσεις σεισμομέτρου· η ζώνη <code>L</code> και ο κωδικός οργάνου <code>N</code> είναι εκτός των προεπιλογών του, οπότε τα αγνοεί. Αν θέλετε picks GNSS, δημιουργήστε ξεχωριστό προφίλ <code>scautopick</code> δεμένο στον <code>CL.UPC10</code> (ή <code>CL.UPA10</code>) με μακρύ STA/LTA (π.χ. <code>picker.STA = 2</code>, <code>picker.LTA = 60</code>, <code>thresholds.triggerOn = 4</code>) και φίλτρο <code>BW_HP(2,0.05)</code>. Τα πλάτη μεγέθους (<code>scamp</code>) δεν έχουν βαθμονομημένη σημασία για αυτή τη ροή και πρέπει να εξαιρεθούν με <code>amplitudes.enable = false</code> στο προφίλ.</p>
+<h2>7. Προβλήματα και τα σημάδια τους</h2>
+<table width="100%"><tr><th>σημάδι</th><th>αιτία</th><th>διόρθωση</th></tr><tr><td>Το <code>slinktool</code> δείχνει τον σταθμό αλλά δεν φτάνουν εγγραφές</td><td>το GaiaSeis δεν εκπέμπει, ή το προφίλ του έχει κενό <code>datalink_host</code></td><td>ελέγξτε την ιστοσελίδα GaiaSeis· ορίστε <code>datalink_host = "127.0.0.1"</code> στο προφίλ και επανεκκινήστε τη συνεδρία</td></tr><tr><td>Φτάνουν εγγραφές αλλά το SeisComP δεν δείχνει τίποτα</td><td>δεν υπάρχει inventory για τον σταθμό (CL.UPC10 ή CL.UPA10)</td><td>ενότητα 3</td></tr><tr><td>Το <code>slinktool</code> δείχνει τον CL.UPA10 αλλά σταμάτησε στις 22/10/2026</td><td>η παραγωγή μεταφέρθηκε στον UPC10Z</td><td>εγγραφείτε στον CL.UPC10</td></tr><tr><td>Τα ίχνη μοιάζουν με κλιμακωτή συνάρτηση με επαναλαμβανόμενες τιμές</td><td>το <code>miniseed_flush_interval_sec = 0</code> με ένα δείγμα ανά εγγραφή είναι εντάξει· θα ήταν artefact σχεδίασης μεγάλων κενών</td><td>ελέγξτε τα κενά με την εμφάνιση κενών του <code>scrttv</code></td></tr><tr><td>Το ίχνος είναι 18 s νωρίς ή αργά</td><td>λάθος χρονική κλίμακα στην πλευρά GaiaSeis</td><td>οι εγγραφές είναι UTC από 10/09/2026· παλαιότερα αρχεία είναι σε χρόνο GPS</td></tr><tr><td>Τιμές μέτρων μεταξύ 22:00 και 00:00 UTC, ή έκρηξη στις 23:59:42 UTC</td><td>ελαττώματα του υπολογιστικού πυρήνα του GaiaSeis έως την έκδοση 0.4.1 (βλ. <code>docs/Causes_and_Mitigation_Report_2026-10.md</code>)</td><td>διορθώθηκαν στην 0.4.2 (22/10/2026): η έκρηξη του μεσονυκτίου GPS και οι ωριαίες αιχμές αλλαγής εφημερίδας δεν εμφανίζονται πλέον· τα δεδομένα πριν από αυτή την ημερομηνία τις περιέχουν ακόμη</td></tr><tr><td><code>ERROR Write permission not granted</code> στην κονσόλα GaiaSeis</td><td>ringserver σε άλλον υπολογιστή από το GaiaSeis</td><td>προσθέστε <code>WriteIP &lt;gaiaseis host&gt;</code> στη ρύθμιση του ringserver</td></tr></table>
+<h2>8. Τι υπάρχει στον υπολογιστή του GaiaSeis</h2>
+<ul><li><code>~/.local/bin/ringserver</code> (EarthScope ringserver 4.5.6, μεταγλωττισμένος από πηγαίο κώδικα), προς το παρόν στον υπολογιστή του GaiaSeis· θα μεταφερθεί σε αποκλειστικό διακομιστή.</li><li><code>~/.config/gaiaseis/ringserver.conf</code>: δακτύλιος στο <code>~/.local/share/gaiaseis/ring</code>, DataLink στη 16000, SeedLink στη 18000· το <code>AcceptIP</code> περιορίζει και τις δύο σε localhost και στα δίκτυα του τμήματος (προσθέστε καταναλωτή με επεξεργασία του αρχείου· χωρίς επανεκκίνηση).</li><li><code>systemctl --user status gaiaseis-ringserver</code> για την υπηρεσία, <code>journalctl --user -u gaiaseis-ringserver -f</code> για το ημερολόγιό της.</li><li>Επανεγκατάσταση ή μεταφορά σε άλλο μηχάνημα με <code>tools/ringserver/install.sh</code>.</li><li>Η πλευρά GaiaSeis είναι το <code>src/datalink.jl</code>· τα πεδία προφίλ είναι <code>datalink_host</code> και <code>datalink_port</code>· ο επεξεργαστής προφίλ του παραθύρου γραφημάτων τα έχει ως "SeedLink (ringserver) host" και "DataLink port".</li></ul>
+</body></html>

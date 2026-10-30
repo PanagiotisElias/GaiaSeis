@@ -1,0 +1,105 @@
+<html><head><meta charset="utf-8"><title>GaiaSeis: Feeding the real-time displacement solution into SeisComP</title><style>body{font-family:Cambria,Georgia,serif;font-size:11pt;line-height:1.35;max-width:17cm}
+h1{font-size:18pt;color:#1a3b6e;border-bottom:2px solid #1a3b6e;padding-bottom:4px}
+h2{font-size:14pt;color:#1a3b6e;margin-top:18pt} h3{font-size:12pt;color:#333}
+table{border-collapse:collapse;margin:8pt 0;font-size:10pt} th,td{border:1px solid #999;padding:3pt 6pt;text-align:left} th{background:#e8eef7}
+code,pre{font-family:Consolas,"DejaVu Sans Mono",monospace;font-size:9.5pt} pre{background:#f4f4f4;border:1px solid #ccc;padding:6pt}
+.note{background:#fff8e1;border-left:4px solid #e0a800;padding:6pt 8pt;margin:8pt 0}
+.small{font-size:9pt;color:#555}
+</style></head><body>
+<h1>GaiaSeis: Feeding the real-time displacement solution into SeisComP</h1>
+<p>How to take the 10 Hz displacement stream of a GaiaSeis station into a SeisComP system through SeedLink. Two stations exist on the same antenna at the University of Patras: <b>UPC10Z</b> (in production since 2026-10-22, station code <code>UPC10</code>) and <b>UPA10Z</b> (station code <code>UPA10</code>, the production station until 2026-10-22). Use the one that is streaming; the commands below are given for UPC10 with UPA10 in brackets. GaiaSeis 0.4.2, SeisComP 5 or 6. Written 2026-10-06, updated 2026-10-22.</p>
+<div class="note"><b>The SeedLink address (<code>&lt;seedlink-host&gt;:18000</code>) is given to consumers separately; it is temporary until a dedicated ringserver host is installed, and only the host name changes then.</b></div>
+<h2>1. What GaiaSeis provides</h2>
+<p>GaiaSeis writes its solution as miniSEED and pushes every record to a <code>ringserver</code> running beside it. The ringserver is the SeedLink server; SeisComP connects to it like to any other SeedLink source.</p>
+<table width="100%"><tr><th>item</th><th>UPC10Z (production since 2026-10-22)</th><th>UPA10Z</th></tr><tr><td>SeedLink server</td><td>the GaiaSeis host, port 18000 (<code>&lt;seedlink-host&gt;:18000</code>); accepts only the department networks and localhost</td><td>same</td></tr><tr><td>Network, station, location</td><td><code>CL</code>, <code>UPC10</code>, blank</td><td><code>CL</code>, <code>UPA10</code>, blank</td></tr><tr><td>Receiver</td><td>Topcon NET-G5, built-in NTRIP caster, mount <code>B</code></td><td>Topcon NET-G5, built-in NTRIP caster, mount <code>B</code></td></tr><tr><td>Status</td><td>streaming, SSR off, <code>CL.UPC10</code> on SeedLink and in <code>mseed2/</code></td><td>not streaming since 2026-10-22 13:21 UTC; <code>CL.UPA10</code> stopped then</td></tr><tr><td>Channels</td><td><code>LNN</code> north, <code>LNE</code> east, <code>LNZ</code> up</td><td>same</td></tr><tr><td>Sample rate</td><td>10 Hz (one sample per solved epoch)</td><td>same</td></tr><tr><td>Encoding</td><td>miniSEED 2.4, 512-byte records, INT32 samples, big-endian</td><td>same</td></tr><tr><td>Units</td><td>counts; 1 count = 0.1 µm. Counts × 10⁻⁷ = metres of displacement per epoch</td><td>same</td></tr><tr><td>Time stamps</td><td>UTC (the GPS-to-UTC leap seconds are removed before stamping)</td><td>same</td></tr><tr><td>Quantity</td><td>epoch-to-epoch displacement from the variometric solution, i.e. velocity × 0.1 s; integrate for position change</td><td>same</td></tr><tr><td>Gaps</td><td>a missing or blanked epoch closes the record; SeisComP sees a true gap, not a time-shifted trace</td><td>same</td></tr><tr><td>Replay</td><td>the ringserver keeps a 1 GiB disk ring (about one day at the current one-sample-per-record flushing, 2.5 days with 1 s flushing); a reconnecting client resumes by sequence number</td><td>same</td></tr></table>
+<p>Only one of the two streams exists at a time (one GaiaSeis session in production). A consumer that wants both must subscribe to both stations; the one not streaming simply delivers nothing. The receivers' built-in casters degrade with every extra client, so never connect a second NTRIP client to the receiver that production uses; the SeedLink side has no such limit.</p>
+<p><b>Temporary arrangement.</b> The ringserver currently runs on the same machine as GaiaSeis (<code>&lt;seedlink-host&gt;:18000</code>). This is temporary, until a dedicated ringserver host is installed. At that point GaiaSeis will push its records to the new host over DataLink (profile fields <code>datalink_host</code> / <code>datalink_port</code>), the SeedLink address in sections 2 and 4 changes to the new host, and every client must be repointed; the station codes, channels, units and inventory stay the same. Keep the SeedLink address in one configurable place on the consumer side so the move is a one-line change.</p>
+<p>The data stream exists only while GaiaSeis is streaming. The ringserver stays up independently as a systemd user service (<code>gaiaseis-ringserver</code>).</p>
+<h2>2. Quick check before touching SeisComP</h2>
+<p>From a machine on the department networks (since 2026-10-23 the ringserver accepts connections only from the department networks and localhost, <code>AcceptIP</code> in its configuration; any other address is rejected at connection time):</p>
+<pre>python3 tools/seedlink_check.py &lt;seedlink-host&gt; 18000 30 CL UPC10     # or CL UPA10</pre>
+<p>It prints the records as they arrive and ends with <code>OK: all three channels streaming</code>. With SeisComP installed, the same check is:</p>
+<pre>slinktool -Q -S CL_UPC10 &lt;seedlink-host&gt;:18000      # or CL_UPA10</pre>
+<p>With ObsPy:</p>
+<pre>from obspy.clients.seedlink.basic_client import Client
+c = Client(&quot;&lt;seedlink-host&gt;&quot;, 18000)
+print(c.get_info(level=&quot;station&quot;))</pre>
+<h2>3. Inventory</h2>
+<p>SeisComP will not route, display or archive a stream it has no inventory for. Create the station once with a small StationXML or SC3ML file and import it. The response is a pure gain: input displacement in metres, output counts, gain 10⁷ counts per metre, no poles or zeros.</p>
+<p>A complete file for the production station is <code>docs/UPC10.xml</code> (three channels, coordinates of the antenna, start 2026-10-22T13:21:00). For UPA10Z change the station code and the start date. The template below shows one channel:</p>
+<pre>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;FDSNStationXML xmlns=&quot;http://www.fdsn.org/xml/station/1&quot; schemaVersion=&quot;1.1&quot;&gt;
+  &lt;Source&gt;GaiaSeis&lt;/Source&gt;
+  &lt;Created&gt;2026-10-06T00:00:00&lt;/Created&gt;
+  &lt;Network code=&quot;CL&quot; startDate=&quot;2026-01-01T00:00:00&quot;&gt;
+    &lt;Description&gt;Corinth Rift Laboratory GNSS seismogeodesy (GaiaSeis)&lt;/Description&gt;
+    &lt;Station code=&quot;UPA10&quot; startDate=&quot;2026-01-01T00:00:00&quot;&gt;
+      &lt;Latitude&gt;38.288&lt;/Latitude&gt;&lt;Longitude&gt;21.788&lt;/Longitude&gt;&lt;Elevation&gt;100&lt;/Elevation&gt;
+      &lt;Site&gt;&lt;Name&gt;University of Patras, GaiaSeis 10 Hz&lt;/Name&gt;&lt;/Site&gt;
+      &lt;Channel code=&quot;LNN&quot; locationCode=&quot;&quot; startDate=&quot;2026-01-01T00:00:00&quot;&gt;
+        &lt;Latitude&gt;38.288&lt;/Latitude&gt;&lt;Longitude&gt;21.788&lt;/Longitude&gt;&lt;Elevation&gt;100&lt;/Elevation&gt;&lt;Depth&gt;0&lt;/Depth&gt;
+        &lt;Azimuth&gt;0&lt;/Azimuth&gt;&lt;Dip&gt;0&lt;/Dip&gt;
+        &lt;SampleRate&gt;10&lt;/SampleRate&gt;
+        &lt;Sensor&gt;&lt;Description&gt;GNSS variometric displacement (GaiaSeis/PPPHVA)&lt;/Description&gt;&lt;/Sensor&gt;
+        &lt;Response&gt;
+          &lt;InstrumentSensitivity&gt;&lt;Value&gt;1e7&lt;/Value&gt;&lt;Frequency&gt;0.1&lt;/Frequency&gt;
+            &lt;InputUnits&gt;&lt;Name&gt;M&lt;/Name&gt;&lt;Description&gt;Displacement in meters&lt;/Description&gt;&lt;/InputUnits&gt;
+            &lt;OutputUnits&gt;&lt;Name&gt;COUNTS&lt;/Name&gt;&lt;/OutputUnits&gt;&lt;/InstrumentSensitivity&gt;
+          &lt;Stage number=&quot;1&quot;&gt;
+            &lt;PolesZeros&gt;&lt;InputUnits&gt;&lt;Name&gt;M&lt;/Name&gt;&lt;/InputUnits&gt;&lt;OutputUnits&gt;&lt;Name&gt;V&lt;/Name&gt;&lt;/OutputUnits&gt;
+              &lt;PzTransferFunctionType&gt;LAPLACE (RADIANS/SECOND)&lt;/PzTransferFunctionType&gt;
+              &lt;NormalizationFactor&gt;1&lt;/NormalizationFactor&gt;&lt;NormalizationFrequency&gt;0.1&lt;/NormalizationFrequency&gt;&lt;/PolesZeros&gt;
+            &lt;StageGain&gt;&lt;Value&gt;1&lt;/Value&gt;&lt;Frequency&gt;0.1&lt;/Frequency&gt;&lt;/StageGain&gt;
+          &lt;/Stage&gt;
+          &lt;Stage number=&quot;2&quot;&gt;
+            &lt;Coefficients&gt;&lt;InputUnits&gt;&lt;Name&gt;V&lt;/Name&gt;&lt;/InputUnits&gt;&lt;OutputUnits&gt;&lt;Name&gt;COUNTS&lt;/Name&gt;&lt;/OutputUnits&gt;
+              &lt;CfTransferFunctionType&gt;DIGITAL&lt;/CfTransferFunctionType&gt;&lt;/Coefficients&gt;
+            &lt;Decimation&gt;&lt;InputSampleRate&gt;10&lt;/InputSampleRate&gt;&lt;Factor&gt;1&lt;/Factor&gt;&lt;Offset&gt;0&lt;/Offset&gt;
+              &lt;Delay&gt;0&lt;/Delay&gt;&lt;Correction&gt;0&lt;/Correction&gt;&lt;/Decimation&gt;
+            &lt;StageGain&gt;&lt;Value&gt;1e7&lt;/Value&gt;&lt;Frequency&gt;0.1&lt;/Frequency&gt;&lt;/StageGain&gt;
+          &lt;/Stage&gt;
+        &lt;/Response&gt;
+      &lt;/Channel&gt;
+      &lt;!-- LNE: same block with code=&quot;LNE&quot; and &lt;Azimuth&gt;90&lt;/Azimuth&gt;&lt;Dip&gt;0&lt;/Dip&gt; --&gt;
+      &lt;!-- LNZ: same block with code=&quot;LNZ&quot; and &lt;Azimuth&gt;0&lt;/Azimuth&gt;&lt;Dip&gt;-90&lt;/Dip&gt; --&gt;
+    &lt;/Station&gt;
+  &lt;/Network&gt;
+&lt;/FDSNStationXML&gt;</pre>
+<p>Duplicate the channel block for <code>LNE</code> (azimuth 90, dip 0) and <code>LNZ</code> (azimuth 0, dip −90). Then, on the SeisComP host:</p>
+<pre>fdsnxml2inv UPC10.xml &gt; UPC10.sc.xml        # or UPA10.xml
+cp UPC10.sc.xml ~/seiscomp/etc/inventory/
+seiscomp update-config inventory</pre>
+<p><code>scinv check</code> reports what it did not like. The channel codes follow the SEED convention: <code>L</code> for 1 to 10 Hz long-period band, <code>N</code> for a sensor that measures displacement directly, <code>N/E/Z</code> orientation.</p>
+<h2>4. Pointing SeisComP at the stream</h2>
+<p>There are two ways. The first is enough for viewing and picking; the second is the standard way when the data must be archived and served on.</p>
+<h3>4a. Direct: RecordStream to the ringserver</h3>
+<p>Every SeisComP module reads waveforms through <code>recordstream</code>. Set it globally in <code>~/seiscomp/etc/global.cfg</code>:</p>
+<pre>recordstream = slink://&lt;seedlink-host&gt;:18000</pre>
+<p><code>scrttv</code>, <code>scautopick</code>, <code>scamp</code> and friends then read the GaiaSeis channels directly from the ringserver. Nothing is archived on the SeisComP side.</p>
+<h3>4b. Standard: SeisComP's own seedlink with a chain source</h3>
+<p>The SeisComP <code>seedlink</code> module ingests the remote SeedLink stream, re-serves it on the SeisComP host (port 18000 there) and lets <code>slarchive</code> write the SDS archive. Add a binding profile for the chain plugin:</p>
+<pre>seiscomp exec scconfig            # or edit the files below by hand</pre>
+<p>Create <code>~/seiscomp/etc/key/seedlink/profile_gaiaseis</code>:</p>
+<pre>sources = chain
+sources.chain.address = &lt;seedlink-host&gt;
+sources.chain.port = 18000
+sources.chain.selectors = LN?.D
+# keep the original station code; no renaming</pre>
+<p>Bind it to the station in <code>~/seiscomp/etc/key/station_CL_UPC10</code> (and/or <code>station_CL_UPA10</code>):</p>
+<pre>seedlink:gaiaseis
+slarchive:local</pre>
+<p>Then:</p>
+<pre>seiscomp update-config
+seiscomp restart seedlink slarchive
+slinktool -Q -S CL_UPC10 localhost:18000      # should now show the stream locally</pre>
+<p>With <code>slarchive</code> bound, the records go to <code>~/seiscomp/var/lib/archive/2026/CL/UPC10/LNZ.D/CL.UPC10..LNZ.D.2026.295</code>, the same SDS layout GaiaSeis uses for its own day files. Set <code>recordstream</code> to <code>slink://localhost:18000</code> for real-time modules and to <code>combined://slink/localhost:18000;sdsarchive//home/sysop/seiscomp/var/lib/archive</code> for modules that also look back in time.</p>
+<h2>5. Viewing</h2>
+<p><code>scrttv</code> with the station selected shows the three traces. Useful filters for a displacement-per-epoch stream: none for seeing steps, <code>BW_HP(2,0.02)</code> to suppress long drifts. The amplitude scale is in counts; divide by 10⁷ for metres. In <code>scrttv</code> the y-axis unit comes from the inventory (<code>InputUnits = M</code>), so with the response loaded the trace is labelled in metres when "unit" display is on.</p>
+<p>Note that the stream is displacement per epoch, not position. A static offset of the station after an earthquake shows up as a pulse during the motion and returns to zero afterwards; integrate (<code>scrttv</code> cannot; ObsPy <code>trace.integrate()</code> can) to see the step.</p>
+<h2>6. Picking and amplitudes</h2>
+<p>Do not let the default <code>scautopick</code> run on these channels with its seismometer settings; <code>L</code> band and <code>N</code> instrument codes are outside its defaults, so by default it ignores them. If GNSS picks are wanted, create a dedicated <code>scautopick</code> profile bound to <code>CL.UPC10</code> (or <code>CL.UPA10</code>) with a long STA/LTA (for example <code>picker.STA = 2</code>, <code>picker.LTA = 60</code>, <code>thresholds.triggerOn = 4</code>) and the <code>BW_HP(2,0.05)</code> filter. Magnitude amplitudes (<code>scamp</code>) have no calibrated meaning for this stream and should be excluded with <code>amplitudes.enable = false</code> in that profile.</p>
+<h2>7. Problems and their signs</h2>
+<table width="100%"><tr><th>sign</th><th>cause</th><th>fix</th></tr><tr><td><code>slinktool</code> lists the station but no records arrive</td><td>GaiaSeis is not streaming, or its profile has <code>datalink_host</code> blank</td><td>check the GaiaSeis web page; set <code>datalink_host = "127.0.0.1"</code> in the profile and restart the session</td></tr><tr><td>Records arrive but SeisComP shows nothing</td><td>no inventory for the station (CL.UPC10 or CL.UPA10)</td><td>section 3</td></tr><tr><td><code>slinktool</code> shows CL.UPA10 but it stopped on 2026-10-22</td><td>production moved to UPC10Z</td><td>subscribe to CL.UPC10</td></tr><tr><td>Traces look like a step function with repeated values</td><td><code>miniseed_flush_interval_sec = 0</code> and one sample per record is fine; this would be a plotting artefact of large gaps</td><td>check gaps with <code>scrttv</code> gap display</td></tr><tr><td>Trace is 18 s early or late</td><td>wrong time scale on the GaiaSeis side</td><td>the records are UTC since 2026-09-10; older files are GPS time</td></tr><tr><td>Metre-level values between 22:00 and 00:00 UTC, or a burst at 23:59:42 UTC</td><td>engine defects of GaiaSeis up to 0.4.1 (see <code>docs/Causes_and_Mitigation_Report_2026-10.md</code>)</td><td>fixed in 0.4.2 (2026-10-22): the GPS-midnight burst and the hourly changeover spikes no longer occur; data before that date still carries them</td></tr><tr><td><code>ERROR Write permission not granted</code> in the GaiaSeis console</td><td>ringserver on another host than GaiaSeis</td><td>add <code>WriteIP &lt;gaiaseis host&gt;</code> to the ringserver config</td></tr></table>
+<h2>8. What is on the GaiaSeis host</h2>
+<ul><li><code>~/.local/bin/ringserver</code> (EarthScope ringserver 4.5.6, built from source), on the GaiaSeis host for now; to move to a dedicated host.</li><li><code>~/.config/gaiaseis/ringserver.conf</code>: ring in <code>~/.local/share/gaiaseis/ring</code>, DataLink on 16000, SeedLink on 18000; <code>AcceptIP</code> limits both to localhost and the department networks (edit the file to add a consumer; no restart needed).</li><li><code>systemctl --user status gaiaseis-ringserver</code> for the service, <code>journalctl --user -u gaiaseis-ringserver -f</code> for its log.</li><li>Re-install or move to another machine with <code>tools/ringserver/install.sh</code>.</li><li>The GaiaSeis side is <code>src/datalink.jl</code>; the profile fields are <code>datalink_host</code> and <code>datalink_port</code>; the plot window's profile editor has them as "SeedLink (ringserver) host" and "DataLink port".</li></ul>
+</body></html>

@@ -1,0 +1,81 @@
+<html><head><meta charset="utf-8"><title>GaiaSeis, Why N is noisier than E</title><link rel="stylesheet" href="_style.css"></head><body>
+<h1>GaiaSeis 0.3, Why the North component is noisier than East, and why the vertical noise rose</h1>
+<p class="small">Panagiotis Elias · GaiaSeis / NtripClient.jl · analysis of the UPA10Z session of 2026-09-09 (12:03–12:22 local, GPS-only, single-frequency variometric, 10 Hz, 10° mask, SSR SSRA00GFZ0). All numbers below come from the session log <code>logs/GaiaSeis-UPA10Z.log</code>, the broadcast ephemeris mount BCEP00BKG0 and the live web panels.</p>
+
+<h2>1. Summary</h2>
+<ul>
+<li>Per-epoch (0.1 s) displacement noise, robust σ: <b>N 1.9 mm, E 1.3 mm, U 3.7 mm</b> (session median). The N/E ratio varied between 1.3 and 1.85 minute by minute.</li>
+<li>The variometric solution has no ambiguities, so the noise in each component is white phase noise mapped through the <i>weighted</i> satellite geometry. PPPHVA weights every satellite by <b>sin²(elevation)</b>. With that weighting today's constellation gives NDOP/EDOP = 1.35–1.53 and VDOP/EDOP = 2.6, matching the observed 1.3–1.85 and 2.9. Unweighted DOP (1.08) hides the effect.</li>
+<li>The vertical noise rose from 3.1 to 7.5 mm between 12:03 and 12:17 because the number of satellites the solver could use fell from 9 to 5. With those five (all between 34° and 67° elevation) the weighted VDOP is 6.4 instead of 3.0. This is a GPS-only geometry limitation, not a receiver or software fault.</li>
+<li>The station position was re-estimated by single-point positioning (§6); the previous seed was 365 m off in height and produced a +3.6 mm/epoch east bias. It has been corrected in the profile.</li>
+</ul>
+
+<h2>2. The estimator and its weighting</h2>
+<p>PPPHVA's single-frequency variometric LSQ (<code>src/Filtering/sfvlsq.jl</code>) solves, every epoch, the time-differenced carrier-phase observation equation</p>
+<pre>ΔΦ<sub>s</sub>(t) − ΔC<sub>s</sub>(t) = e<sub>s</sub>ᵀ · Δr + c·Δδt<sub>r</sub> + ε<sub>s</sub></pre>
+<p>where ΔΦ is the phase difference between epochs t and t−1 for satellite s, ΔC the modelled change (orbit, clock, relativity, wind-up, tides, tropo), e<sub>s</sub> the unit line-of-sight vector, Δr the 3-D displacement over the epoch and Δδt<sub>r</sub> the receiver-clock change. Each row is weighted</p>
+<pre>W<sub>s</sub> = c<sub>sys</sub> · cos²(90° − el<sub>s</sub>) = c<sub>sys</sub> · sin²(el<sub>s</sub>)      (sfvlsq.jl line 104; c<sub>sys</sub> = 1 for GPS)</pre>
+<p>and the estimate is x̂ = (HᵀWH)⁻¹HᵀW·v. The covariance of x̂ is σ₀²·(HᵀWH)⁻¹; rotated into the local frame its diagonal gives the <b>weighted dilution of precision</b> EDOP, NDOP, VDOP. The per-component noise is simply σ₀ × DOP. A satellite at 15° elevation has weight 0.07, at 45° 0.50, at 70° 0.88, so the solution is carried almost entirely by the satellites above ~30°.</p>
+
+<h2>3. Today's geometry</h2>
+<p><img src="figures/fig_skyplot_weights.png" width="420"></p>
+<p class="small">Figure 1, GPS satellites above the 10° mask at 12:10 local, marker area proportional to the sin²(el) weight.</p>
+<table><tr><th>Weighting</th><th>EDOP</th><th>NDOP</th><th>VDOP</th><th>NDOP/EDOP</th><th>VDOP/EDOP</th></tr>
+<tr><td>none</td><td>0.53</td><td>0.57</td><td>1.11</td><td>1.08</td><td>2.1</td></tr>
+<tr><td>sin(el)</td><td>0.87</td><td>0.98</td><td>1.77</td><td>1.13</td><td>2.0</td></tr>
+<tr><td><b>sin²(el), PPPHVA</b></td><td>1.20</td><td>1.62</td><td>3.14</td><td><b>1.35</b></td><td><b>2.6</b></td></tr>
+<tr><td>sin²(el), satellites &lt; 20° effectively removed</td><td>1.30</td><td>1.99</td><td>4.68</td><td><b>1.53</b></td><td>3.6</td></tr></table>
+<p>East is pinned by two high satellites almost opposite each other east–west: G03 (az 94°, el 48°) and G09 (az 281°, el 60°). North has to lean on G04 (az 18° but el 68°, nearly overhead, so almost no horizontal leverage), G07 (az 190°, el 32°) and the low north-east/north-west satellites G11, G26, G31 (el 10–13°) that carry 2–4 % weight each. The often-quoted "northern sky hole" of the 55°-inclination GPS constellation is the reason those northern satellites are low in the first place.</p>
+
+<h2>4. Evidence in the data</h2>
+<table><tr><th>minute</th><th>σN (mm)</th><th>σE (mm)</th><th>σU (mm)</th><th>N/E</th><th>GPS used</th></tr>
+<tr><td>0</td><td>1.88</td><td>1.14</td><td>3.06</td><td>1.65</td><td>9</td></tr>
+<tr><td>2</td><td>1.89</td><td>1.40</td><td>3.72</td><td>1.35</td><td>8</td></tr>
+<tr><td>5</td><td>1.93</td><td>1.24</td><td>3.86</td><td>1.56</td><td>8</td></tr>
+<tr><td>8</td><td>1.71</td><td>1.32</td><td>4.26</td><td>1.30</td><td>7</td></tr>
+<tr><td>11</td><td>2.25</td><td>1.32</td><td>5.50</td><td>1.70</td><td>7</td></tr>
+<tr><td>12</td><td>2.32</td><td>1.37</td><td>7.43</td><td>1.69</td><td>6</td></tr>
+<tr><td>14</td><td>2.54</td><td>1.47</td><td>7.55</td><td>1.73</td><td>5</td></tr>
+<tr><td>17</td><td>1.78</td><td>1.55</td><td>5.15</td><td>1.15</td><td>8</td></tr></table>
+<p>Two further signatures confirm that this is geometry acting on white phase noise and not a site or software effect:</p>
+<ul>
+<li>The lag-1 autocorrelation is −0.46 in N, E and U alike, the fingerprint of differencing white noise between consecutive epochs (theoretical value −0.5).</li>
+<li>Summing 10 consecutive epochs (a 1-s displacement) increases the noise by only ~1.2× instead of √10 = 3.2×, because the intermediate epochs telescope out; the 1-s displacement noise is 2.3 / 1.6 / 3.5 mm (N/E/U).</li>
+</ul>
+
+<h2>5. Why the vertical noise rose (12:03 → 12:17) and why the usable satellites dropped from 9 to 5</h2>
+<p><img src="figures/fig_noise_minutes.png" width="640"></p>
+<p class="small">Figure 2, per-minute robust noise (left) and GPS satellites used by the solver (right, solid) with 2×VDOP from all visible satellites (dashed).</p>
+<p>Between 12:03 and 12:17 local the constellation above the 10° mask went from 10 to 9 satellites, but what the solver could actually use went from 9 to 5:</p>
+<table><tr><th>satellite</th><th>12:06</th><th>12:17</th><th>what happened</th></tr>
+<tr><td>G17</td><td>el 11°, used</td><td>set</td><td>dropped below the 10° mask at 12:06</td></tr>
+<tr><td>G31</td><td>el 14°, used</td><td>set</td><td>dropped below the mask at 12:16</td></tr>
+<tr><td>G01, G19</td><td>el 19°, 16°</td><td>el 13°, 12°</td><td>hovering just above the mask; intermittent loss of lock → excluded epoch by epoch</td></tr>
+<tr><td>G11, G26</td><td>el 10–11°</td><td>el 11–13°</td><td>above the mask by ephemeris but <b>not tracked</b> by the receiver at all (the GUI sky plot at 12:19 shows G16/G17/G19/G31 instead), obstruction or receiver channel policy on the NE/NW horizon</td></tr>
+<tr><td>G16</td><td>below horizon</td><td>rising</td><td>reached 10° only at 12:24, then needed ephemeris + SSR before it could be used</td></tr>
+<tr><td><b>G03, G04, G06, G07, G09</b></td><td colspan="2">el 34–67°</td><td>the five that remained</td></tr></table>
+<table><tr><th>configuration</th><th>Σ weights</th><th>EDOP</th><th>NDOP</th><th>VDOP</th></tr>
+<tr><td>12:06, 10 visible</td><td>3.16</td><td>1.17</td><td>1.74</td><td>3.01</td></tr>
+<tr><td>12:17, 9 visible (if all had been usable)</td><td>3.13</td><td>1.23</td><td>1.66</td><td>3.45</td></tr>
+<tr><td><b>12:17, the 5 the solver kept</b></td><td>2.94</td><td>1.32</td><td>2.21</td><td><b>6.39</b></td></tr></table>
+<p>VDOP 3.0 → 6.4 predicts a 2.1× rise in vertical noise; observed 3.1 → 7.5 mm (2.4×). Note the "Σ weights" column: the five kept satellites carry 94 % of the total weight, so even if the four low ones had been usable the weighted VDOP would only have been 3.45. <b>In GPS-only mode, with sin² weighting, the vertical component effectively rests on whatever is above ~30°, and at 38° N that is often only four to six satellites.</b> It is the same reason U is always 2–3× noisier than E.</p>
+<p><img src="figures/gui_skyplot_1219.png" width="420"></p>
+<p class="small">Figure 3, the GUI sky plot at 12:19 local: the receiver tracks 10 GPS satellites, but the usable set is G03/G04/G06/G07/G09 plus, intermittently, G01 and G19.</p>
+
+<h3>What to do about it</h3>
+<ol>
+<li><b>Enable Galileo</b> in the UPA10Z profile (<code>enable_gal = true</code>). The receiver already streams Galileo MSM (1095, ~600 messages/min), the ephemeris mount BCEP00BKG0 and the SSR mount SSRA00GFZ0 both carry Galileo (72 satellites had SSR corrections in this session). NOA10Z runs this way (MANUAL §10.2). Roughly doubling the satellites above 30° cuts VDOP by ~√2 and removes most of the sensitivity to setting satellites.</li>
+<li>Keep the 10° mask. Lowering it adds satellites with 1–3 % weight and more multipath, no gain.</li>
+<li>Do not change the sin² weighting without validation; it is what keeps low-elevation multipath out of the solution.</li>
+<li>For products, use the 1-s or longer displacement (the 10-epoch sum), where the noise is dominated by the end-point phase noise rather than the per-epoch differences.</li>
+</ol>
+
+<h2>6. Best estimate of the UPA10Z antenna position</h2>
+<p>The receiver does not send RTCM 1005/1006, so GaiaSeis seeds the a-priori position from the profile. A wrong seed enters the variometric solution as a constant per-epoch bias (≈1.9·10⁻⁵ rad per epoch × position error); the previous seed (height copied from NOA10Z) gave N −2.1, E +3.6, U −2.5 mm per epoch and, at every stream gap, one-sided east spikes of +7 to +17 mm. The position was re-estimated with <code>tools/spp_estimate.jl</code>: iono-free GPS pseudoranges from the mount, 32 broadcast ephemerides, 811 epochs (81 s), median of per-epoch solutions with 9 satellites, per-epoch scatter 2.4 / 1.0 / 0.9 m in X/Y/Z.</p>
+<table><tr><th></th><th>Latitude</th><th>Longitude</th><th>Ellipsoidal height</th></tr>
+<tr><td><b>SPP estimate (WGS84 / broadcast frame)</b></td><td><b>38.2832291° N</b></td><td><b>21.7862421° E</b></td><td><b>123.79 m</b></td></tr>
+<tr><td>previous profile seed</td><td>38.2832290°</td><td>21.7862670°</td><td>488.88 m</td></tr></table>
+<table><tr><th></th><th>X (m)</th><th>Y (m)</th><th>Z (m)</th></tr>
+<tr><td><b>ECEF</b></td><td><b>4 655 048.533</b></td><td><b>1 860 590.108</b></td><td><b>3 930 246.352</b></td></tr></table>
+<p>Realistic accuracy of this estimate is 2–3 m (broadcast orbits/clocks, modelled troposphere, L1-only ionosphere for satellites without L2). At that level the residual variometric bias is below 0.1 mm per epoch. After writing the seed into the profile the measured bias was N +0.01, E +0.02, U −0.25 mm per epoch and the one-sided spikes disappeared. If a surveyed coordinate exists it should replace this estimate; enabling 1005/1006 on the receiver makes the profile seed irrelevant.</p>
+</body></html>

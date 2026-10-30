@@ -1,0 +1,43 @@
+<html><head><meta charset="utf-8"><title>GaiaSeis, Outlier guard and the MAD</title><link rel="stylesheet" href="_style.css"></head><body>
+<h1>GaiaSeis 0.3, The outlier guard, the MAD, and the "remaining minor item"</h1>
+<p class="small">Panagiotis Elias · GaiaSeis / NtripClient.jl · 2026-09-09</p>
+
+<p class="small"><b>Update 2026-10-20 (GaiaSeis 0.4.1-dev).</b> The bridge guard described below no longer blanks epochs. Because a genuine strong-motion pulse is indistinguishable from a spike by amplitude (at 6 &times; MAD, about 6&nbsp;cm/s horizontal at 10&nbsp;Hz, the old guard would have blanked the onset of an earthquake, and its self-reset latch produced the 19&ndash;22-epoch blank runs), the MAD test is now <i>flag only</i> (defaults 8 &times; MAD over 200 epochs) and epochs are blanked only by a quality gate: fewer than 8 satellites or 2 constellations, PDOP above 5, post-fit residual RMS above 0.1&nbsp;m, or a step above 5&nbsp;m/s &times; the epoch interval. Per-satellite residual flags are reported alongside. See MANUAL &sect;5.7 and &sect;5.23. The text below describes the 0.3/0.4.0 behaviour.</p>
+
+<h2>1. The observation</h2>
+<p>In the UPA10Z session of 2026-09-09, after the a-priori position was corrected, 2–3 % of all epochs were still logged as NaN (blanked) by the bridge's outlier guard, 207 of ~9 000 epochs in the first 17 minutes, and only 1 of the first 23 blanked epochs followed a stream gap. So these rejections are not the gap-scaled bias that was fixed earlier; they come from the guard's statistics. The consequences are mild but real: a 0.1-s hole in the displacement series, a missing sample in the miniSEED channels (now handled as a proper time tear, see the operator guide), and an optimistic noise figure because the tails are cut off.</p>
+
+<h2>2. Definition of the MAD</h2>
+<p>For a sample x₁…x<sub>n</sub> the <b>median absolute deviation</b> is</p>
+<pre>MAD = median( |x<sub>i</sub> − median(x)| )</pre>
+<p>It is a robust measure of scale: up to 50 % of the sample can be arbitrarily wrong before the MAD is affected (breakdown point 0.5), whereas a single wild value dominates the classical standard deviation. For normally distributed data the MAD is not equal to σ; the expectation is MAD = Φ⁻¹(0.75)·σ = 0.6745·σ, hence the consistency factor</p>
+<pre>σ̂ = 1.4826 · MAD</pre>
+<p>which is what both PPPHVA (<code>_isoutlier</code>) and the GaiaSeis bridge (<code>_outlier_guard!</code>) use ("MATLAB scaling"). A test "|x − median| &gt; k·σ̂" is therefore a k-sigma test that cannot be pulled open by the very outliers it is meant to catch.</p>
+<p><img src="figures/fig_mad_E.png" width="640"><br><img src="figures/fig_mad_U.png" width="640"></p>
+<p class="small">Figure 1, distribution of the accepted per-epoch E and U displacements of the session, with the median, ±σ̂ = ±1.4826·MAD and the ±6σ̂ guard limits. Because the guard evaluates the MAD over the last 20 epochs (not the whole session), and because the rejected epochs are absent from these histograms, the session-wide count beyond ±6σ̂ is smaller than the guard's own rejection count.</p>
+
+<h2>3. The two MAD tests in the pipeline</h2>
+<table><tr><th></th><th>PPPHVA <code>_isoutlier</code> (sfvlsq.jl)</th><th>bridge <code>_outlier_guard!</code> (bridge.jl)</th></tr>
+<tr><td>what is tested</td><td>the vector of per-satellite pre-fit residuals v = z − c of <i>one</i> epoch</td><td>the estimated dXYZ of the current epoch against the last <i>outlier_window</i> accepted epochs, per component</td></tr>
+<tr><td>threshold</td><td>3·σ̂ (fixed)</td><td><i>outlier_mad_threshold</i> × σ̂ (profile; 6 for UPA10Z)</td></tr>
+<tr><td>sample size</td><td>number of satellites (5–10)</td><td><i>outlier_window</i> epochs (20 for UPA10Z = 2 s at 10 Hz)</td></tr>
+<tr><td>action</td><td>drop the satellite from this epoch's LSQ (only during the first 3 epochs or when std(v) &gt; 2.5·running σ)</td><td>blank the epoch (NaN in log, CSV and miniSEED), do not add it to the window; after <i>outlier_window</i> consecutive rejections wipe the window and re-seed (assumes real motion)</td></tr>
+<tr><td>floor</td><td>none (MAD = 0 → no rejection)</td><td>σ̂ ≥ 0.1 mm per component</td></tr></table>
+
+<h2>4. Why a 20-epoch window rejects 2–3 %</h2>
+<p>Three effects add up:</p>
+<ol>
+<li><b>Sampling noise of the MAD.</b> For Gaussian data the relative standard error of the MAD is ≈ 1.17/√n: with n = 20 it is 26 %, so the "6σ̂" limit actually sits anywhere between ~4.4σ and ~7.6σ from window to window. That alone would still give far less than 0.1 % false alarms for Gaussian noise, it is not the main cause, but it makes the guard erratic.</li>
+<li><b>Heavy tails in the per-epoch solution.</b> The per-epoch dXYZ is not Gaussian: with 5–9 satellites, sin² weighting and low satellites losing lock, single epochs occasionally carry 5–10σ excursions (the U histogram shows |U| up to 27 mm against σ̂ = 3.7 mm). These are genuine bad epochs; the guard is doing its job on them. When the usable satellite count dropped to five (see the N-vs-E document), the rejection rate rose with it.</li>
+<li><b>Three independent component tests.</b> A rejection happens if <i>any</i> of X, Y, Z trips, so the effective rate is roughly three times the per-component rate, and the test is done in ECEF axes where the noisy vertical mixes into all three.</li>
+</ol>
+<p>In other words, the "minor item" is mostly the guard correctly rejecting heavy-tail epochs of a weak GPS-only geometry, made noisier than necessary by a very short window.</p>
+
+<h2>5. Recommendation</h2>
+<ul>
+<li>Set <code>outlier_window = 200</code> (20 s at 10 Hz, the value the NOA10Z recipe in MANUAL §10.2 already uses). The σ̂ estimate then has a 8 % standard error instead of 26 %, the limit becomes stable, and short bursts of bad epochs cannot inflate the baseline. Keep <code>outlier_mad_threshold = 6</code>.</li>
+<li>Reduce the tails at the source: enable Galileo for UPA10Z (doubles the satellites above 30°).</li>
+<li>Judge the guard by the <code>outliers_rejected</code> counter in <code>/status.json</code> (added in 0.3) against the epoch count; 0.1–0.5 % is the expected regime for a healthy multi-GNSS geometry.</li>
+<li>Do not disable the guard (<code>outlier_mad_threshold = 0</code>) for seismological consumers: one 30-mm bad epoch in a 10 Hz miniSEED channel looks exactly like a P-wave onset.</li>
+</ul>
+</body></html>

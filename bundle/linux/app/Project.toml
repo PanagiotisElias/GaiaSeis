@@ -1,0 +1,17 @@
+name = "GaiaSeisApp"
+uuid = "528d3158-7042-4257-a499-edb440d85470"
+version = "0.2.0"
+authors = ["Panagiotis Elias"]
+
+# Thin wrapper package that exists only to give PackageCompiler a
+# `julia_main()` entry point. GaiaSeis, the GaiaVario engine (and PPPHVA
+# when asked for) are wired in as local path deps by build_app.jl — do not
+# add version bounds for them here.
+[deps]
+Cairo = "159f3aea-2a34-519c-b102-8c37f9878175"
+GaiaSeis = "7c8d0e1a-3b4c-4f9a-9d2e-1a3b5c7d9e0f"
+GaiaVario = "2f6b9c4e-7d1a-4e8b-9a3c-5e0f1d2b3c4a"
+Gtk4 = "9db2cae5-386f-4011-9d63-a5602296539b"
+
+[compat]
+julia = "1.10"

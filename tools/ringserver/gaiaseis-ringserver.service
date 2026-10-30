@@ -1,0 +1,17 @@
+# systemd user unit for the GaiaSeis SeedLink service (ringserver).
+# Installed by tools/ringserver/install.sh to ~/.config/systemd/user/.
+#   systemctl --user status gaiaseis-ringserver
+#   journalctl --user -u gaiaseis-ringserver -f
+[Unit]
+Description=GaiaSeis SeedLink service (ringserver: DataLink 16000 in, SeedLink 18000 out)
+After=network-online.target
+
+[Service]
+ExecStart=%h/.local/bin/ringserver -STDERR %h/.config/gaiaseis/ringserver.conf
+Restart=always
+RestartSec=5
+# ringserver memory-maps the 1 GiB ring; keep the fd/mem limits generous.
+LimitNOFILE=4096
+
+[Install]
+WantedBy=default.target

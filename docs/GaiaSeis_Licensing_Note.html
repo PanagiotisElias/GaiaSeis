@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>GaiaSeis: licensing note</title>
+<style>
+body{font-family:Calibri,Arial,sans-serif;font-size:10.5pt;line-height:1.35}
+h1{font-size:20pt;margin-bottom:2pt} h2{font-size:14pt;margin-top:14pt;border-bottom:1px solid #888}
+h3{font-size:11.5pt;margin-bottom:2pt}
+table{border-collapse:collapse;width:100%} td,th{border:1px solid #999;padding:3pt 5pt;vertical-align:top;font-size:9.5pt}
+th{background:#e6e6e6;text-align:left} .sub{color:#555}
+</style></head><body>
+
+<h1>GaiaSeis: licensing note</h1>
+<p class="sub">Panagiotis Elias, Deforming Gaia Lab, Department of Geology, University of Patras. Prepared 2026-10-29, final decision recorded 2026-10-30, for the public release 0.5.0 (GitHub and Zenodo). This is a technical summary of the choice and its reasons, not legal advice.</p>
+
+<h2>1. Summary</h2>
+<p><b>Decision:</b> the <b>GaiaSeis software</b> (the platform, its engine interface package GaiaSeisEngineAPI, tools, tests and examples) and the <b>GaiaVario engine</b> (GaiaVario.jl, the clean-room variometric engine that is the default engine of GaiaSeis) are released under the <b>GNU Affero General Public License, version 3 only</b> (SPDX: <code>AGPL-3.0-only</code>). The <b>documents</b> (user manual, reports, leaflet, guides, figures) are released under <b>Creative Commons Attribution-NonCommercial 4.0 (CC BY-NC 4.0)</b>. The translated engine <b>PPPHVA.jl is not distributed</b> until the PPPH-VA authors answer (sections 6 and 7); the platform runs without it.</p>
+<p><b>Open point:</b> the licence of the original MATLAB PPPH-VA code, from which PPPHVA.jl is translated, is not stated anywhere. The authors have to be asked; their answer decides the licence of PPPHVA.jl (section 6). It does not affect the release: GaiaSeis 0.5.0 ships with GaiaVario and offers the PPPHVA path only where that package is installed separately.</p>
+
+<h2>2. What was considered</h2>
+<table>
+<tr><th>Licence</th><th>Type</th><th>Commercial use</th><th>Main effect</th></tr>
+<tr><td>MIT / BSD</td><td>Permissive</td><td>Allowed, also in closed products</td><td>Maximum reuse; anyone may keep improvements private.</td></tr>
+<tr><td>GPL-3.0</td><td>Strong copyleft</td><td>Allowed</td><td>Distributed derivatives must stay GPL-3.0 with source. Running it as a network service does not trigger the obligation.</td></tr>
+<tr><td><b>AGPL-3.0</b></td><td>Strong copyleft with network clause</td><td>Allowed</td><td>As GPL, plus: users who interact with a modified version over a network (for example the GaiaSeis web page or SeedLink service) must be offered its source.</td></tr>
+<tr><td><b>EUPL-1.2</b></td><td>Copyleft, written by the European Commission</td><td>Allowed</td><td>Distributed modifications stay under EUPL or a listed compatible licence (GPL-2.0/3.0, AGPL-3.0, LGPL, MPL-2.0, EPL, CeCILL). Online communication counts like distribution. Default governing law is Belgian unless the licensor's country is specified. Recommended by the Commission for EU-funded software.</td></tr>
+<tr><td>CC BY-NC 4.0</td><td>Attribution, non-commercial</td><td><b>Not allowed</b></td><td>Free to share and adapt with credit, but not for commercial purposes. Not an open-source licence.</td></tr>
+</table>
+
+<h2>3. The NonCommercial (NC) clause</h2>
+<ul>
+<li><b>Definition (CC BY-NC 4.0):</b> NonCommercial means "not primarily intended for or directed towards commercial advantage or monetary compensation". Exchanging copies for no payment is not commercial.</li>
+<li><b>It is not open source.</b> The Open Source Definition and the Free Software Definition forbid restrictions on fields of use. Software under NC cannot be called open source or free software.</li>
+<li><b>It is incompatible with the GPL family.</b> GPL/AGPL forbid adding restrictions. Code under NC cannot be combined with GPL/AGPL code in one distributed work. Using NC for the software would also block anyone from combining GaiaSeis with GPL components.</li>
+<li><b>Vague boundary.</b> Is use by a company's research group, a contractor of a seismological service, or a university project with industrial funding "commercial"? The text leaves this to interpretation, which deters adopters and creates dispute risk.</li>
+<li><b>Creative Commons itself does not recommend its licences for software</b> (they do not address patents, source-code distribution or compilation). It recommends software licences such as those of the FSF or OSI.</li>
+<li><b>Funding and repositories.</b> The EU programme (TRANSFORM<sup>2</sup>) and Zenodo favour open licences; an NC software licence would be at odds with open-science expectations for publicly funded software.</li>
+<li><b>Where NC is reasonable:</b> for texts, figures and manuals. The author keeps the right to commercial reuse of the documents, and the documents carry no code-compatibility problem.</li>
+</ul>
+
+<h2>4. What is more appropriate</h2>
+<p><b>For the software, a copyleft open-source licence is more appropriate than NC.</b> Reasons: NC cannot be combined with GPL/AGPL libraries, is not recognised as open source, is ambiguous, and is discouraged by Creative Commons for code. The sensible choice is between permissive (MIT) and copyleft (GPL or AGPL).</p>
+<ul>
+<li><b>MIT</b> maximises adoption but lets a third party take GaiaSeis, improve it and keep the improvements closed.</li>
+<li><b>GPL-3.0</b> keeps distributed derivatives open, but a company could run a modified GaiaSeis as a hosted service without releasing changes.</li>
+<li><b>AGPL-3.0</b> closes that gap, because GaiaSeis is itself a network service (web page, SeedLink through ringserver). It keeps every public deployment's improvements available to the community, while still allowing commercial use and consultancy. It is the closest legal substitute for what NC was meant to achieve (preventing closed commercial appropriation) without the incompatibilities.</li>
+</ul>
+<p><b>For the documents, CC BY-NC 4.0 is appropriate</b> (or CC BY 4.0 if maximal reuse is wanted). Because documents are not code, the incompatibility and tooling objections do not apply.</p>
+
+<h2>5. What was selected, and consequences</h2>
+<table>
+<tr><th>Material</th><th>Licence</th><th>Consequence</th></tr>
+<tr><td>GaiaSeis (the platform: NTRIP client, RTCM decoder, epoch grouping, quality gates, outputs, GUI), GaiaSeisEngineAPI, tools, tests, examples</td><td>AGPL-3.0-only</td><td>Anyone may use, including commercially, and modify. Modified versions, including those offered as a network service, must be published with source under the same licence. Copyright notice stays.</td></tr>
+<tr><td>GaiaVario.jl (default engine, own repository)</td><td>AGPL-3.0-only</td><td>Same terms as the platform. Written from the public interface control documents and model references; no code of other variometric packages was consulted, so its licence does not depend on anyone's answer.</td></tr>
+<tr><td>PPPHVA.jl (translated engine)</td><td>Not distributed until the authors agree</td><td>Licence set by their answer (section 6). The platform offers the engine name <code>ppphva</code> only where the package is installed separately.</td></tr>
+<tr><td>User manual, reports, leaflet, guides, figures</td><td>CC BY-NC 4.0</td><td>Reuse with attribution, not for commercial purposes. File <code>docs/LICENSE-DOCS</code> states this.</td></tr>
+<tr><td>Third-party data (ANTEX, GPT3 grid)</td><td>Not redistributed</td><td>Not needed by the default engine; the PPPHVA path documents where they come from, each under its owner's terms.</td></tr>
+</table>
+<h3>Points to know about the choice</h3>
+<ul>
+<li><b>The author stays the copyright holder</b> and is not bound by AGPL for his own code. A separate commercial licence (dual licensing) may be offered later, provided every contributor has agreed to it. <code>CONTRIBUTING.md</code> asks contributors to license their contributions under AGPL-3.0-only and to certify authorship (sign-off).</li>
+<li><b>Anyone's use of GaiaSeis output</b> (displacement series, miniSEED, SeedLink streams) is not covered by AGPL; the licence applies to the program, not to the data it produces.</li>
+<li><b>Dependencies.</b> The Julia packages used (HTTP, Gtk4 and others) carry MIT or LGPL terms and are compatible with AGPL-3.0. ringserver (EarthScope) is an external program, not linked or bundled.</li>
+<li><b>Citation.</b> Licence conditions require keeping the copyright and licence notice. Academic credit is requested through <code>CITATION.cff</code> and the Zenodo DOI.</li>
+</ul>
+
+<h2>6. The PPPH-VA question</h2>
+<p>PPPHVA.jl is a Julia translation of PPPH-VA (Bahadur, Bezcioglu, Yigit, GPS Solutions, 2023, doi 10.1007/s10291-023-01560-z). The paper calls it open-source but names no licence, and the source archive carries none. A translation is a derivative work. Without a licence, the authors' permission is required before publication.</p>
+<table>
+<tr><th>Authors' answer</th><th>Licence of PPPHVA.jl</th><th>GaiaSeis</th></tr>
+<tr><td>Permissive (MIT, BSD) or written permission to use AGPL</td><td>AGPL-3.0</td><td>Unchanged (AGPL-3.0-only); the engine can then be published as a separate package.</td></tr>
+<tr><td>GPL-3.0</td><td>GPL-3.0 (cannot be relicensed)</td><td>Unchanged (GPL-3.0 section 13 allows combining GPL and AGPL code); the engine published as a separate GPL-3.0 package.</td></tr>
+<tr><td>Non-commercial only</td><td>Cannot be combined with AGPL</td><td>Unchanged; the translation stays private.</td></tr>
+<tr><td>No answer</td><td>Do not publish the translation</td><td>Unchanged; GaiaSeis is released with GaiaVario.</td></tr>
+</table>
+<p>The request to the three authors is sent independently of the release; the release does not wait for it.</p>
+
+<h2>7. Distributing PPPHVA.jl (source or binary)</h2>
+<p>A compiled or bundled PPPHVA.jl is still a derivative work of the MATLAB code, and giving a copy to someone is distribution in either form. With no licence stated, all rights remain with the authors, so permission is needed for source, binary bundle, GitHub and Zenodo alike. A GitHub or Zenodo publication cannot be reliably withdrawn.</p>
+<p><b>Decision:</b> PPPHVA.jl is not supplied in any form until the authors agree in writing. The public repository, the Linux and Windows bundles and the Zenodo deposit contain neither the package nor its data files; the platform's own dynamic-struct type replaces the one it used to import, the engine name <code>ppphva</code> is offered only where the package is found at load time (environment, <code>GAIASEIS_PPPHVA_PATH</code>, or <code>../PPPH_VA/PPPHVA.jl</code>), and a profile that asks for it elsewhere fails to start with a message that says so. PPPH-VA is acknowledged in <code>NOTICE.md</code> and the manual as the reference implementation used during development, with its citation.</p>
+<p>When binaries are distributed: keep the licence texts in the bundle, link the exact tagged source (AGPL source offer), and list the licences of bundled third-party software (Julia runtime and packages mostly MIT; GTK libraries LGPL). Earlier private copies of the translation given to collaborators for testing are to be mentioned in the request to the authors.</p>
+
+<h2>8. Why a single licence</h2>
+<p>A dual licence "AGPL-3.0 or EUPL-1.2, at the recipient's choice" was considered because EUPL-1.2 is the Commission's recommended licence for EU-funded software. A single licence, AGPL-3.0-only, was chosen instead:</p>
+<ul>
+<li><b>One text to read.</b> Recipients, contributors and repository tooling deal with one licence; the <code>LICENSE</code> file is the AGPL text itself, not a statement about a choice between two.</li>
+<li><b>AGPL is already EUPL-compatible for inbound reuse.</b> EUPL-1.2 lists AGPL-3.0 among its compatible licences, so an EUPL project may incorporate GaiaSeis code; nothing is lost on the EU side by not offering EUPL as a second option.</li>
+<li><b>Simpler CITATION and SPDX.</b> <code>CITATION.cff</code>, <code>Project.toml</code>, the Zenodo record and every <code>SPDX-License-Identifier</code> carry the plain expression <code>AGPL-3.0-only</code>; contributors agree to one licence and no dual-grant clause is needed.</li>
+<li><b>Decision authority.</b> The author, as coordinator of the TRANSFORM<sup>2</sup> project, publishes the software under this licence without a separate technology-transfer consultation; the choice is an open copyleft licence consistent with the project's open-science obligations.</li>
+</ul>
+
+<h2>9. Files in the public repositories</h2>
+<ul>
+<li><code>LICENSE</code>: the full text of the GNU Affero General Public License, version 3, with "Copyright (C) 2026 Panagiotis Elias, Deforming Gaia Lab, Department of Geology, University of Patras" in the notice. The same file in GaiaVario.jl.</li>
+<li><code>docs/LICENSE-DOCS</code>: CC BY-NC 4.0 for the documents under <code>docs/</code>.</li>
+<li><code>NOTICE.md</code>: platform-and-engines statement; GaiaVario as the default engine; PPPH-VA credit and reference, and that its translation is not distributed; ringserver as the external SeedLink server; funding wording of TRANSFORM<sup>2</sup>.</li>
+<li><code>CITATION.cff</code>: version 0.5.0, licence AGPL-3.0-only, Zenodo DOI (to be assigned), the PPPH-VA reference marked as applying to the optional engine.</li>
+<li><code>CONTRIBUTING.md</code>: contributions under AGPL-3.0-only with sign-off; no code derived from PPPH-VA or other variometric packages in the platform or GaiaVario.</li>
+<li>README funding section: TRANSFORM<sup>2</sup> wording and logo.</li>
+</ul>
+</body></html>

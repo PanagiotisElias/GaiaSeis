@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- GaiaSeis icon-only mark — no wordmark, square 512x512, transparent
+     background. Same geometry as GaiaSeis_logo.svg's icon block but
+     re-scaled into a square viewport. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="skyFill" cx="50%" cy="32%" r="78%">
+      <stop offset="0%"   stop-color="#1c5db5"/>
+      <stop offset="65%"  stop-color="#0d2a55"/>
+      <stop offset="100%" stop-color="#04122e"/>
+    </radialGradient>
+    <linearGradient id="pulseStroke" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#f6c244"/>
+      <stop offset="55%"  stop-color="#e9621d"/>
+      <stop offset="100%" stop-color="#b71d0f"/>
+    </linearGradient>
+    <linearGradient id="earthArc" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#b88a5a"/>
+      <stop offset="100%" stop-color="#6e5235"/>
+    </linearGradient>
+    <linearGradient id="subsurfFill" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#3a2c1a" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#1a1208" stop-opacity="0.65"/>
+    </linearGradient>
+    <clipPath id="badgeClipIcon">
+      <circle cx="256" cy="256" r="226"/>
+    </clipPath>
+    <linearGradient id="beamFade" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#fff6c4" stop-opacity="0.95"/>
+      <stop offset="55%"  stop-color="#f6c244" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#e9621d" stop-opacity="0.05"/>
+    </linearGradient>
+    <linearGradient id="beamFade2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#f6c244" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#f6c244" stop-opacity="0.0"/>
+    </linearGradient>
+    <linearGradient id="beamFadeCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#bff0ff" stop-opacity="0.95"/>
+      <stop offset="55%"  stop-color="#5bc1e6" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#1b7aa3" stop-opacity="0.05"/>
+    </linearGradient>
+    <linearGradient id="beamFadeCyan2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#5bc1e6" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#5bc1e6" stop-opacity="0.0"/>
+    </linearGradient>
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="2.5"/>
+    </filter>
+    <radialGradient id="radomeHL" cx="40%" cy="35%" r="65%">
+      <stop offset="0%"   stop-color="#ffffff" stop-opacity="0.9"/>
+      <stop offset="55%"  stop-color="#dde2eb" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#9ea7b8" stop-opacity="0.0"/>
+    </radialGradient>
+  </defs>
+
+  <circle cx="256" cy="256" r="240" fill="#cfd5dd"/>
+  <circle cx="256" cy="256" r="226" fill="url(#skyFill)"/>
+
+  <!-- Cassiopeia W asterism — discrete background constellation between
+       the two satellites. Hints at the celestial reference frame used for
+       GNSS orbits; a Greek-mythology nod to the Patras lab. -->
+  <g id="cassiopeia">
+    <polyline points="200,160 230,110 258,158 286,110 316,160"
+              fill="none" stroke="#bcd0ea" stroke-width="0.8"
+              stroke-opacity="0.32" stroke-linecap="round"
+              stroke-linejoin="round"/>
+    <g fill="#f5faff">
+      <circle cx="200" cy="160" r="2.1" opacity="0.80"/>
+      <circle cx="230" cy="110" r="2.6" opacity="0.92"/>
+      <circle cx="258" cy="158" r="1.9" opacity="0.78"/>
+      <circle cx="286" cy="110" r="2.8" opacity="0.95"/>
+      <circle cx="316" cy="160" r="2.2" opacity="0.82"/>
+    </g>
+    <g fill="#cfd9eb">
+      <circle cx="184" cy="125" r="0.8" opacity="0.55"/>
+      <circle cx="218" cy="175" r="0.7" opacity="0.5"/>
+      <circle cx="246" cy="88"  r="0.9" opacity="0.6"/>
+      <circle cx="270" cy="180" r="0.7" opacity="0.5"/>
+      <circle cx="295" cy="165" r="0.8" opacity="0.55"/>
+      <circle cx="328" cy="138" r="0.7" opacity="0.5"/>
+      <circle cx="206" cy="190" r="0.6" opacity="0.4"/>
+      <circle cx="275" cy="130" r="0.6" opacity="0.45"/>
+    </g>
+  </g>
+
+  <!-- Subsurface darker fill -->
+  <g clip-path="url(#badgeClipIcon)">
+    <rect x="30" y="400" width="452" height="100" fill="url(#subsurfFill)"/>
+  </g>
+
+  <!-- Surface marker: only the wavy terrain undulations remain
+       (the two split ground arcs were removed). The wavy terrain
+       itself shows the subsidence — right half sits 8 px lower than
+       the left. -->
+
+  <path d="M 95 400 Q 135 388, 175 396
+           Q 210 404, 245 394 Q 270 388, 275 396"
+        fill="none" stroke="#cfa478" stroke-width="4"
+        stroke-linecap="round" opacity="0.65"/>
+  <path d="M 290 406 Q 330 414, 365 404 Q 400 396, 445 408"
+        fill="none" stroke="#cfa478" stroke-width="4"
+        stroke-linecap="round" opacity="0.65"/>
+
+  <!-- Rupture trace surfacing at the scarp + winding down -->
+  <g clip-path="url(#badgeClipIcon)">
+    <path d="M 282 400
+             Q 280 404, 282 408
+             C 266 420, 304 434, 282 448
+             C 258 462, 306 466, 284 482
+             C 268 494, 302 498, 286 508"
+          fill="none" stroke="#c0392b" stroke-width="3"
+          stroke-linecap="round" opacity="0.92"/>
+  </g>
+
+  <!-- Satellite, rotated +52° (= -38° tangent + 90°) so the solar-panel
+       axis is radial relative to the badge centre. -->
+  <g transform="translate(380,118) rotate(52)">
+    <rect x="-15" y="-12" width="30" height="24" rx="2.5"
+          fill="#e5e9f0" stroke="#0a2147" stroke-width="2.4"/>
+    <rect x="-52" y="-7" width="34" height="14" rx="1.5"
+          fill="#3b6dbf" stroke="#0a2147" stroke-width="1.8"/>
+    <rect x="18"  y="-7" width="34" height="14" rx="1.5"
+          fill="#3b6dbf" stroke="#0a2147" stroke-width="1.8"/>
+    <g stroke="#0a2147" stroke-width="0.9" opacity="0.6">
+      <line x1="-44" y1="-7" x2="-44" y2="7"/>
+      <line x1="-36" y1="-7" x2="-36" y2="7"/>
+      <line x1="-28" y1="-7" x2="-28" y2="7"/>
+      <line x1="28"  y1="-7" x2="28"  y2="7"/>
+      <line x1="36"  y1="-7" x2="36"  y2="7"/>
+      <line x1="44"  y1="-7" x2="44"  y2="7"/>
+    </g>
+    <line x1="0" y1="12" x2="0" y2="18" stroke="#0a2147" stroke-width="2"/>
+    <circle cx="0" cy="20" r="3.5" fill="#e5e9f0" stroke="#0a2147" stroke-width="1.4"/>
+  </g>
+
+  <!-- Artistic beams — glow + main + two faint side beams + packets -->
+  <g filter="url(#softGlow)">
+    <path d="M 370 150 C 320 220, 270 300, 215 378"
+          fill="none" stroke="url(#beamFade)"
+          stroke-width="7" stroke-linecap="round"/>
+  </g>
+  <path d="M 370 150 C 320 220, 270 300, 215 378"
+        fill="none" stroke="url(#beamFade)"
+        stroke-width="3" stroke-linecap="round"/>
+  <path d="M 354 130 C 308 200, 258 282, 200 376"
+        fill="none" stroke="url(#beamFade2)"
+        stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M 384 168 C 340 232, 285 308, 230 386"
+        fill="none" stroke="url(#beamFade2)"
+        stroke-width="1.8" stroke-linecap="round"/>
+  <g fill="#fff6c4">
+    <circle cx="334" cy="220" r="2.8"/>
+    <circle cx="288" cy="280" r="2.3" opacity="0.85"/>
+    <circle cx="250" cy="335" r="1.9" opacity="0.7"/>
+  </g>
+
+  <!-- Second satellite (Galileo-style) — hex bus, gold panels, dish under -->
+  <g transform="translate(132,128) rotate(-52)">
+    <path d="M -16 0 L -9 -13 L 9 -13 L 16 0 L 9 13 L -9 13 Z"
+          fill="#94a3b8" stroke="#04122e" stroke-width="2.2"/>
+    <line x1="-16" y1="0" x2="-22" y2="0" stroke="#04122e" stroke-width="2.2"/>
+    <line x1="16"  y1="0" x2="22"  y2="0" stroke="#04122e" stroke-width="2.2"/>
+    <rect x="-44" y="-15" width="22" height="30" rx="1.8"
+          fill="#c89a3d" stroke="#04122e" stroke-width="1.8"/>
+    <rect x="22"  y="-15" width="22" height="30" rx="1.8"
+          fill="#c89a3d" stroke="#04122e" stroke-width="1.8"/>
+    <g stroke="#04122e" stroke-width="0.9" opacity="0.55">
+      <line x1="-33" y1="-15" x2="-33" y2="15"/>
+      <line x1="-44" y1="0"   x2="-22" y2="0"/>
+      <line x1="33"  y1="-15" x2="33"  y2="15"/>
+      <line x1="22"  y1="0"   x2="44"  y2="0"/>
+    </g>
+    <path d="M -10 13 Q 0 26, 10 13" fill="#e5e9f0" stroke="#04122e" stroke-width="1.5"/>
+    <line x1="0" y1="13" x2="0" y2="22" stroke="#04122e" stroke-width="1.8"/>
+    <circle cx="0" cy="24" r="2.6" fill="#e9621d" stroke="#04122e" stroke-width="1.1"/>
+  </g>
+
+  <g filter="url(#softGlow)">
+    <path d="M 148 150 C 168 220, 184 300, 198 378"
+          fill="none" stroke="url(#beamFadeCyan)"
+          stroke-width="6" stroke-linecap="round"/>
+  </g>
+  <path d="M 148 150 C 168 220, 184 300, 198 378"
+        fill="none" stroke="url(#beamFadeCyan)"
+        stroke-width="2.8" stroke-linecap="round"/>
+  <path d="M 130 132 C 152 200, 170 282, 186 380"
+        fill="none" stroke="url(#beamFadeCyan2)"
+        stroke-width="2.0" stroke-linecap="round"/>
+  <g fill="#dff5ff">
+    <circle cx="166" cy="220" r="2.3" opacity="0.9"/>
+    <circle cx="184" cy="295" r="1.9" opacity="0.7"/>
+  </g>
+
+  <!-- Antenna: radome only (sized to fill the original assembly's footprint) -->
+  <g transform="translate(200,388)">
+    <rect x="-6" y="0" width="12" height="16" fill="#5a6275" stroke="#04122e" stroke-width="1"/>
+    <ellipse cx="0" cy="0" rx="32" ry="4" fill="#7a8395" stroke="#04122e" stroke-width="1.2"/>
+    <path d="M -30 0 A 30 34 0 0 1 30 0 Z"
+          fill="#e5e9f0" stroke="#04122e" stroke-width="1.5"/>
+    <path d="M -30 0 A 30 34 0 0 1 30 0 Z" fill="url(#radomeHL)"/>
+    <circle cx="0" cy="-34" r="2.2" fill="#e9621d" stroke="#04122e" stroke-width="0.9"/>
+  </g>
+
+  <!-- Seismogram waveform -->
+  <path d="M 70 285
+           L 105 285
+           Q 118 283, 130 288  Q 143 293, 156 285
+           Q 168 277, 178 287  Q 188 297, 198 282
+           Q 208 260, 220 305  Q 230 215, 244 345
+           Q 258 175, 272 315  Q 284 265, 296 287
+           Q 308 297, 322 284  Q 334 273, 348 287
+           Q 360 297, 374 285  Q 390 274, 405 287
+           L 445 287"
+        fill="none" stroke="url(#pulseStroke)" stroke-width="5"
+        stroke-linecap="round" stroke-linejoin="round"/>
+
+  <g stroke="#cfd5dd" stroke-width="1.8" opacity="0.7">
+    <line x1="130" y1="325" x2="130" y2="333"/>
+    <line x1="210" y1="325" x2="210" y2="333"/>
+    <line x1="295" y1="325" x2="295" y2="333"/>
+    <line x1="380" y1="325" x2="380" y2="333"/>
+  </g>
+</svg>

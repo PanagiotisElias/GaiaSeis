@@ -1,0 +1,56 @@
+cff-version: 1.2.0
+message: "If you use GaiaSeis, please cite it as below. Results obtained with the optional PPPH-VA engine path must also cite Bahadur, Bezcioglu & Yigit (GPS Solutions 28:31, 2024)."
+type: software
+title: "GaiaSeis: GNSS-based real-time seismogeodesy platform"
+version: 0.5.0
+date-released: 2026-10-30
+license: AGPL-3.0-only
+repository-code: "https://github.com/PanagiotisElias/GaiaSeis"
+url: "https://github.com/PanagiotisElias/GaiaSeis"
+# doi: 10.5281/zenodo.XXXXXXX   (filled in after the first Zenodo archive)
+authors:
+  - family-names: Elias
+    given-names: Panagiotis
+    email: pelias@upatras.gr
+    affiliation: "Deforming Gaia Lab, Department of Geology, University of Patras, Greece"
+    orcid: "https://orcid.org/0000-0002-8650-0895"
+keywords:
+  - GNSS
+  - seismogeodesy
+  - real-time
+  - NTRIP
+  - RTCM
+  - variometric approach
+  - miniSEED
+  - SeedLink
+  - Julia
+abstract: >-
+  GaiaSeis connects to NTRIP casters, decodes RTCM 3 observation and
+  ephemeris streams, groups each receiver epoch and hands it to a
+  displacement engine plug-in (default: GaiaVario, a variometric engine),
+  and publishes the displacement time series as miniSEED files, a SeedLink
+  feed (through ringserver), a web page and a GTK GUI. Developed within the
+  TRANSFORM² project (European Union, project number 101188365).
+references:
+  - type: software
+    title: "GaiaVario.jl: variometric GNSS displacement engine for GaiaSeis"
+    authors:
+      - family-names: Elias
+        given-names: Panagiotis
+    repository-code: "https://github.com/PanagiotisElias/GaiaVario.jl"
+    license: AGPL-3.0-only
+  - type: article
+    title: "PPPH-VA: an open-source software for real-time multi-GNSS variometric approach using single- and dual-frequency observations"
+    authors:
+      - family-names: Bahadur
+        given-names: Berkay
+      - family-names: Bezcioglu
+        given-names: Mert
+      - family-names: Yigit
+        given-names: Cemal Ozer
+    journal: "GPS Solutions"
+    year: 2024
+    volume: 28
+    issue: 1
+    start: 31
+    doi: 10.1007/s10291-023-01560-z

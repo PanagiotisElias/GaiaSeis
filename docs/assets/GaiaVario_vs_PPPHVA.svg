@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1360" height="1440" viewBox="0 0 680 720" xmlns="http://www.w3.org/2000/svg" font-family="Liberation Sans, Arial, Helvetica, sans-serif">
+<title>GaiaVario versus PPPHVA</title>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#5F5E5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<rect x="0" y="0" width="680" height="720" fill="#FFFFFF"/>
+<g>
+<rect x="200" y="40" width="280" height="44" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+<text x="340" y="59" text-anchor="middle" font-size="14" font-weight="500" fill="#444441">GaiaSeis bridge</text>
+<text x="340" y="76" text-anchor="middle" font-size="12" fill="#5F5E5A">MSM epochs, ephemerides, SSR</text>
+<line x1="300" y1="84" x2="290" y2="100" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="380" y1="84" x2="530" y2="100" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="180" y="102" width="220" height="36" rx="8" fill="#FAECE7" stroke="#D85A30" stroke-width="0.5"/>
+<text x="290" y="125" text-anchor="middle" font-size="14" font-weight="500" fill="#712B13">PPPHVA.jl (translation)</text>
+<rect x="420" y="102" width="220" height="36" rx="8" fill="#E1F5EE" stroke="#1D9E75" stroke-width="0.5"/>
+<text x="530" y="125" text-anchor="middle" font-size="14" font-weight="500" fill="#085041">GaiaVario.jl (rewritten)</text>
+</g>
+<!-- rows -->
+<g id="rows">
+<!-- row template: label gray, left coral, right teal -->
+<g transform="translate(0,156)">
+<rect x="40" width="120" height="48" rx="4" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/><text x="100" y="29" text-anchor="middle" font-size="14" font-weight="500" fill="#444441">Time</text>
+<rect x="180" width="220" height="48" rx="4" fill="#FAECE7" stroke="#D85A30" stroke-width="0.5"/><text x="290" y="19" text-anchor="middle" font-size="14" font-weight="500" fill="#712B13">Seconds of day</text><text x="290" y="36" text-anchor="middle" font-size="12" fill="#993C1D">day wrap fixed in 0.4.2</text>
+<rect x="420" width="220" height="48" rx="4" fill="#E1F5EE" stroke="#1D9E75" stroke-width="0.5"/><text x="530" y="19" text-anchor="middle" font-size="14" font-weight="500" fill="#085041">GpsTime (week, tow)</text><text x="530" y="36" text-anchor="middle" font-size="12" fill="#0F6E56">exact differences, no wrap</text>
+</g>
+<g transform="translate(0,218)">
+<rect x="40" width="120" height="48" rx="4" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/><text x="100" y="29" text-anchor="middle" font-size="14" font-weight="500" fill="#444441">Ephemeris pair</text>
+<rect x="180" width="220" height="48" rx="4" fill="#FAECE7" stroke="#D85A30" stroke-width="0.5"/><text x="290" y="19" text-anchor="middle" font-size="14" font-weight="500" fill="#712B13">Pair may change record</text><text x="290" y="36" text-anchor="middle" font-size="12" fill="#993C1D">bridge rebuilds pmodel</text>
+<rect x="420" width="220" height="48" rx="4" fill="#E1F5EE" stroke="#1D9E75" stroke-width="0.5"/><text x="530" y="19" text-anchor="middle" font-size="14" font-weight="500" fill="#085041">One record per pair</text><text x="530" y="36" text-anchor="middle" font-size="12" fill="#0F6E56">pinned at previous epoch</text>
+</g>
+<g transform="translate(0,280)">
+<rect x="40" width="120" height="48" rx="4" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/><text x="100" y="29" text-anchor="middle" font-size="14" font-weight="500" fill="#444441">Orbits</text>
+<rect x="180" width="220" height="48" rx="4" fill="#FAECE7" stroke="#D85A30" stroke-width="0.5"/><text x="290" y="19" text-anchor="middle" font-size="14" font-weight="500" fill="#712B13">Kepler + GLONASS RK4</text><text x="290" y="36" text-anchor="middle" font-size="12" fill="#993C1D">BDS GEO C01–C05 skipped</text>
+<rect x="420" width="220" height="48" rx="4" fill="#E1F5EE" stroke="#1D9E75" stroke-width="0.5"/><text x="530" y="19" text-anchor="middle" font-size="14" font-weight="500" fill="#085041">Kepler, GEO, GLONASS</text><text x="530" y="36" text-anchor="middle" font-size="12" fill="#0F6E56">all four systems</text>
+</g>
+<g transform="translate(0,342)">
+<rect x="40" width="120" height="48" rx="4" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/><text x="100" y="29" text-anchor="middle" font-size="14" font-weight="500" fill="#444441">Troposphere</text>
+<rect x="180" width="220" height="48" rx="4" fill="#FAECE7" stroke="#D85A30" stroke-width="0.5"/><text x="290" y="19" text-anchor="middle" font-size="14" font-weight="500" fill="#712B13">GPT3 grid + VMF3</text><text x="290" y="36" text-anchor="middle" font-size="12" fill="#993C1D">1.1 MB grid, 86 kB table</text>
+<rect x="420" width="220" height="48" rx="4" fill="#E1F5EE" stroke="#1D9E75" stroke-width="0.5"/><text x="530" y="19" text-anchor="middle" font-size="14" font-weight="500" fill="#085041">Saastamoinen + Niell</text><text x="530" y="36" text-anchor="middle" font-size="12" fill="#0F6E56">no data files needed</text>
+</g>
+<g transform="translate(0,404)">
+<rect x="40" width="120" height="48" rx="4" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/><text x="100" y="29" text-anchor="middle" font-size="14" font-weight="500" fill="#444441">Tide, antenna</text>
+<rect x="180" width="220" height="48" rx="4" fill="#FAECE7" stroke="#D85A30" stroke-width="0.5"/><text x="290" y="19" text-anchor="middle" font-size="14" font-weight="500" fill="#712B13">Tide, wind-up, PCO/PCV</text><text x="290" y="36" text-anchor="middle" font-size="12" fill="#993C1D">ANTEX file per antenna</text>
+<rect x="420" width="220" height="48" rx="4" fill="#E1F5EE" stroke="#1D9E75" stroke-width="0.5"/><text x="530" y="19" text-anchor="middle" font-size="14" font-weight="500" fill="#085041">Tide, wind-up; no PCO</text><text x="530" y="36" text-anchor="middle" font-size="12" fill="#0F6E56">PCO changes by µm per epoch</text>
+</g>
+<g transform="translate(0,466)">
+<rect x="40" width="120" height="48" rx="4" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/><text x="100" y="29" text-anchor="middle" font-size="14" font-weight="500" fill="#444441">Estimator</text>
+<rect x="180" width="220" height="48" rx="4" fill="#FAECE7" stroke="#D85A30" stroke-width="0.5"/><text x="290" y="19" text-anchor="middle" font-size="14" font-weight="500" fill="#712B13">LS, 2.5σ residual gate</text><text x="290" y="36" text-anchor="middle" font-size="12" fill="#993C1D">satellite flags in bridge</text>
+<rect x="420" width="220" height="48" rx="4" fill="#E1F5EE" stroke="#1D9E75" stroke-width="0.5"/><text x="530" y="19" text-anchor="middle" font-size="14" font-weight="500" fill="#085041">LS, 4σ MAD rejection</text><text x="530" y="36" text-anchor="middle" font-size="12" fill="#0F6E56">reason per satellite</text>
+</g>
+<g transform="translate(0,528)">
+<rect x="40" width="120" height="48" rx="4" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/><text x="100" y="29" text-anchor="middle" font-size="14" font-weight="500" fill="#444441">Noise σ</text>
+<rect x="180" width="220" height="48" rx="4" fill="#FAECE7" stroke="#D85A30" stroke-width="0.5"/><text x="290" y="19" text-anchor="middle" font-size="14" font-weight="500" fill="#712B13">σ̂ EMA 300 up / 30 down</text><text x="290" y="36" text-anchor="middle" font-size="12" fill="#993C1D">since 0.4.2</text>
+<rect x="420" width="220" height="48" rx="4" fill="#E1F5EE" stroke="#1D9E75" stroke-width="0.5"/><text x="530" y="19" text-anchor="middle" font-size="14" font-weight="500" fill="#085041">Median of last 300 RMS</text><text x="530" y="36" text-anchor="middle" font-size="12" fill="#0F6E56">formal σ for N, E, U</text>
+</g>
+<g transform="translate(0,590)">
+<rect x="40" width="120" height="48" rx="4" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/><text x="100" y="29" text-anchor="middle" font-size="14" font-weight="500" fill="#444441">Speed</text>
+<rect x="180" width="220" height="48" rx="4" fill="#FAECE7" stroke="#D85A30" stroke-width="0.5"/><text x="290" y="19" text-anchor="middle" font-size="14" font-weight="500" fill="#712B13">2 ms per epoch</text><text x="290" y="36" text-anchor="middle" font-size="12" fill="#993C1D">VMF3 memoised</text>
+<rect x="420" width="220" height="48" rx="4" fill="#E1F5EE" stroke="#1D9E75" stroke-width="0.5"/><text x="530" y="19" text-anchor="middle" font-size="14" font-weight="500" fill="#085041">0.11 ms per epoch</text><text x="530" y="36" text-anchor="middle" font-size="12" fill="#0F6E56">38 satellites, 47 kB alloc</text>
+</g>
+<g transform="translate(0,652)">
+<rect x="40" width="120" height="48" rx="4" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/><text x="100" y="29" text-anchor="middle" font-size="14" font-weight="500" fill="#444441">Status</text>
+<rect x="180" width="220" height="48" rx="4" fill="#FAECE7" stroke="#D85A30" stroke-width="0.5"/><text x="290" y="19" text-anchor="middle" font-size="14" font-weight="500" fill="#712B13">In production, CL.UPC10</text><text x="290" y="36" text-anchor="middle" font-size="12" fill="#993C1D">PPPH-VA licence pending</text>
+<rect x="420" width="220" height="48" rx="4" fill="#E1F5EE" stroke="#1D9E75" stroke-width="0.5"/><text x="530" y="19" text-anchor="middle" font-size="14" font-weight="500" fill="#085041">Synthetic truth only</text><text x="530" y="36" text-anchor="middle" font-size="12" fill="#0F6E56">bridge adapter not done</text>
+</g>
+</g>
+</svg>

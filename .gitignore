@@ -1,0 +1,10 @@
+config/ntrip_profiles.toml
+config/plot_settings.toml
+logs/
+mseed/
+mseed2/
+examples/data/
+bundle/dist/
+bundle/linux/dist/
+*.bak
+*~

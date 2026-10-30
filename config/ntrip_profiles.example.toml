@@ -1,0 +1,117 @@
+# GaiaSeis profiles: example file.
+#
+# Copy to config/ntrip_profiles.toml (that file is ignored by git: it holds
+# your caster credentials) and edit. Every key is optional: a missing key takes
+# the default shown here. The GUI edits the same file ("Save profile").
+#
+# The platform never connects to a receiver directly: `caster` is an NTRIP
+# caster (or a local relay) that serves the receiver's RTCM 3 stream
+# (MSM4–MSM7 observations; 1005/1006 station position; 1019/1020/1042/1045/1046
+# ephemerides, either on the same mount or on a separate ephemeris mount).
+
+active = "example_station"
+
+# ---------------------------------------------------------------------------
+# A 10 Hz station with its own ephemeris mount, GaiaVario engine (default),
+# miniSEED files and a SeedLink feed through a local ringserver.
+# ---------------------------------------------------------------------------
+[profiles.example_station]
+# --- observation stream -----------------------------------------------------
+caster          = "caster.example.org"   # host name or IP of the NTRIP caster
+port            = 2101
+mountpoint      = "STAT00XXX0"           # RTCM 3 MSM mount of the receiver
+user            = "<ntrip user>"
+password        = "<ntrip password>"
+use_tls         = false
+send_gga        = false                  # true for VRS/network mounts that need a position
+gga_lat_deg     = 0.0
+gga_lon_deg     = 0.0
+gga_height_m    = 0.0                    # also the a-priori position when the stream has no 1005/1006
+link_description = ""                    # free text shown in the Metrics window
+
+# --- separate broadcast-ephemeris mount (optional) --------------------------
+use_eph         = true
+eph_caster      = "products.igs-ip.net"  # e.g. an IGS caster (registration required)
+eph_port        = 2101
+eph_mountpoint  = "BCEP00BKG0"
+eph_user        = "<igs user>"
+eph_password    = "<igs password>"
+eph_use_tls     = false
+
+# --- SSR orbit/clock corrections (optional; used only by the in-bridge path) --
+use_ssr         = false
+ssr_caster      = ""
+ssr_port        = 2101
+ssr_mountpoint  = ""
+ssr_user        = ""
+ssr_password    = ""
+ssr_use_tls     = false
+ssr_fallback    = true                   # fall back to broadcast when SSR is stale
+ssr_max_age_s   = 60.0
+
+# --- constellations ---------------------------------------------------------
+enable_gps      = true
+enable_glo      = true
+enable_gal      = true
+enable_bds      = true
+
+# --- engine -----------------------------------------------------------------
+engine          = "gaiavario"            # engine plug-in name (GaiaVario.jl)
+engine_mode     = "l1gf"                 # GaiaVario observable: l1gf | single | dual | mean
+engine_path     = ""                     # directory of the plug-in package when it is not in the Julia environment, e.g. "../GaiaVario.jl"
+engine_options  = "elev_mask_deg=10.0,weight_model=sin2,reject_k=4.0,robust=reject,min_sats=5"
+elv_cutoff_deg  = 10.0                   # elevation mask (passed to the plug-in as elev_mask_deg)
+process_mode    = "DFV"                  # in-bridge path only (manual 3.4): DFV | SFV
+antex_file      = ""                     # optional ANTEX file (not redistributed; obtain from the IGS or the manufacturer)
+
+# --- quality gate and guards -----------------------------------------------
+min_sats_used   = 8
+min_constellations = 2
+max_pdop        = 5.0
+max_fit_rms_m   = 0.1
+max_velocity_mps = 5.0
+max_gap_epochs  = 5                      # no variometric difference across a hole longer than this
+solve_incomplete_epochs = false
+outlier_window  = 20                     # amplitude flag (flag only, the epoch is kept)
+outlier_mad_threshold = 6.0
+
+# --- session ----------------------------------------------------------------
+log_dir         = "logs"
+output_filename = ""                     # per-epoch log name; blank = GaiaSeis-<profile>.log
+keep_session_logs = 20
+reconnect_min_delay_sec = 1.0
+reconnect_max_delay_sec = 30.0
+stall_timeout_sec = 30.0
+
+# --- miniSEED sink ----------------------------------------------------------
+miniseed_mseed_dir = "./mseed"           # blank = no miniSEED files
+miniseed_csv_path  = ""                  # optional CSV row per epoch
+miniseed_network   = "XX"
+miniseed_station   = "STAT"
+miniseed_location  = ""
+miniseed_channel_prefix = "LN"           # channels LNN, LNE, LNZ (+ location)
+miniseed_sample_rate_hz = 10.0           # must match the stream rate
+miniseed_scale     = 1.0e7               # counts per metre (INT32 records)
+miniseed_flush_interval_sec = 0.0        # 0 = one sample per record (lowest latency)
+
+# --- SeedLink through ringserver (optional) ---------------------------------
+datalink_host   = ""                     # "127.0.0.1" to push every record to a local ringserver (tools/ringserver/install.sh)
+datalink_port   = 16000
+
+# ---------------------------------------------------------------------------
+# A public 1 Hz EUREF-IP mount, GPS+Galileo, no outputs beyond the log and the
+# web page (registration at https://igs.bkg.bund.de/ntrip/ is free).
+# ---------------------------------------------------------------------------
+[profiles.euref_example]
+caster          = "euref-ip.net"
+port            = 2101
+mountpoint      = "<EUREF mount>"
+user            = "<euref user>"
+password        = "<euref password>"
+enable_gps      = true
+enable_glo      = false
+enable_gal      = true
+enable_bds      = false
+engine          = "gaiavario"
+engine_mode     = "l1gf"
+miniseed_sample_rate_hz = 1.0
